@@ -1,7 +1,6 @@
 /**
- * `NotesList` uses two delays: `scheduleSyncUpdate` → 1s before `setIsChanged(true)` and copying `updatedIds`
- * into `savedUpdatedIds`; then an effect on `isChanged` + `notesFeed` arms an 800ms timer before `reorderCallback`.
- * That ordering window is a plausible source of mismatched `ids[]` vs the `feed` snapshot sent to `/api/update`.
+ * `scheduleSyncUpdate` merges into `savedUpdatedIds` immediately and sets `isChanged`.
+ * An effect on `[isChanged, notesFeed]` arms an 800ms timer before `reorderCallback` (POST).
  */
 
 import { describe, expect, it, vi } from 'vitest';
@@ -36,5 +35,21 @@ describe('debounce / timer interaction (model)', () => {
     vi.advanceTimersByTime(200);
     expect(log).toEqual(['800ms', '1s']);
     vi.useRealTimers();
+  });
+
+  it('immediate merge pattern: each schedule flushes pending into saved', () => {
+    let saved: string[] = [];
+    let pending: string[] = [];
+
+    const schedule = () => {
+      saved = Array.from(new Set([...saved, ...pending]));
+      pending = [];
+    };
+
+    pending.push('a');
+    schedule();
+    pending.push('b');
+    schedule();
+    expect(saved.sort()).toEqual(['a', 'b']);
   });
 });

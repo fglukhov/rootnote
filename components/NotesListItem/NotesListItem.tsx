@@ -16,7 +16,7 @@ import {
 } from '@/lib/markdownInput';
 import { useAutoResizeTextarea } from '@/lib/useAutoResizeTextarea';
 import { getFamily } from '@/lib/notesTree';
-import styles from '@/components/NotesListItem.module.scss';
+import styles from './NotesListItem.module.scss';
 import { useNotes } from '@/components/NotesContext';
 import Router from 'next/router';
 
@@ -70,8 +70,6 @@ export type NotesListItemProps = {
     collapsed?: boolean,
   ) => void;
   onToggleCollapse?: (noteId: string, position: number) => void;
-  pendingDeleteId?: string | null;
-  onRestore?: (noteId: string) => void;
   onRunAction?: (
     noteId: string,
     position: number,
@@ -408,31 +406,6 @@ const NotesListItem: React.FC<NotesListItemProps> = (props) => {
     props.familyCount ?? 1,
     props.collapsed,
   );
-
-  if (props.pendingDeleteId === id) {
-    return (
-      <div
-        className={
-          styles.notes_list_item +
-          (props.parentId != 'root' ? ' ml-4 md:ml-8' : '') +
-          ' ' +
-          styles.pending_delete
-        }
-        id={props.id}
-      >
-        <button
-          type="button"
-          className={styles.restore_button}
-          onClick={(e) => {
-            e.stopPropagation();
-            props.onRestore?.(id);
-          }}
-        >
-          Restore
-        </button>
-      </div>
-    );
-  }
 
   //console.log(props)
 
@@ -855,8 +828,6 @@ const NotesListItem: React.FC<NotesListItemProps> = (props) => {
             onToggleCollapse={props.onToggleCollapse}
             onSelect={props.onSelect}
             onComplete={props.onComplete}
-            pendingDeleteId={props.pendingDeleteId}
-            onRestore={props.onRestore}
             onRunAction={props.onRunAction}
           />
         );

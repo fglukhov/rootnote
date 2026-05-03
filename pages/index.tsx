@@ -908,6 +908,7 @@ const Main: React.FC<Props> = (props) => {
 
           <NotesList
             feed={props.session ? props.feed : demoFeed}
+            enableRemoteSync={Boolean(props.session)}
             feedModalSync={feedModalSync}
             onFeedChange={(feed) => {
               localFeedRef.current = feed;

@@ -67,8 +67,23 @@ export default async function handle(req, res) {
       });
     };
 
-    const deleteRow = (id) => {
-      return prisma.note.delete({ where: { id } });
+    const deleteRow = async (id) => {
+      const existing = await prisma.note.findFirst({
+        where: { id, authorId: user.id },
+        select: { id: true },
+      });
+      if (!existing) {
+        return null;
+      }
+      return prisma.$transaction([
+        prisma.noteDeletion.create({
+          data: {
+            noteId: existing.id,
+            authorId: user.id,
+          },
+        }),
+        prisma.note.delete({ where: { id } }),
+      ]);
     };
 
     const results = await Promise.all(

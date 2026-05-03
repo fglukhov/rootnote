@@ -1,4 +1,4 @@
-@import '../assets/scss/vars';
+@import '../../assets/scss/vars';
 
 .notes_list_item {
   color: var(--text-primary);
@@ -182,7 +182,10 @@
   cursor: pointer;
 }
 
-.collapsed > .notes_list_item_row > .notes_list_item_title_wrapper .notes_list_item_arrow {
+.collapsed
+  > .notes_list_item_row
+  > .notes_list_item_title_wrapper
+  .notes_list_item_arrow {
   transform: rotate(-90deg);
 }
 

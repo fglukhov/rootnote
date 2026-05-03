@@ -22,6 +22,12 @@ export type Post = $Result.DefaultSelection<Prisma.$PostPayload>;
  */
 export type Note = $Result.DefaultSelection<Prisma.$NotePayload>;
 /**
+ * Model NoteDeletion
+ *
+ */
+export type NoteDeletion =
+  $Result.DefaultSelection<Prisma.$NoteDeletionPayload>;
+/**
  * Model Account
  *
  */
@@ -49,7 +55,9 @@ export type VerificationToken =
  * Type-safe database client for TypeScript & Node.js
  * @example
  * ```
- * const prisma = new PrismaClient()
+ * const prisma = new PrismaClient({
+ *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+ * })
  * // Fetch zero or more Posts
  * const posts = await prisma.post.findMany()
  * ```
@@ -74,7 +82,9 @@ export class PrismaClient<
    * Type-safe database client for TypeScript & Node.js
    * @example
    * ```
-   * const prisma = new PrismaClient()
+   * const prisma = new PrismaClient({
+   *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
+   * })
    * // Fetch zero or more Posts
    * const posts = await prisma.post.findMany()
    * ```
@@ -172,7 +182,7 @@ export class PrismaClient<
    * ])
    * ```
    *
-   * Read more in our [docs](https://www.prisma.io/docs/concepts/components/prisma-client/transactions).
+   * Read more in our [docs](https://www.prisma.io/docs/orm/prisma-client/queries/transactions).
    */
   $transaction<P extends Prisma.PrismaPromise<any>[]>(
     arg: [...P],
@@ -221,6 +231,16 @@ export class PrismaClient<
    * ```
    */
   get note(): Prisma.NoteDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.noteDeletion`: Exposes CRUD operations for the **NoteDeletion** model.
+   * Example usage:
+   * ```ts
+   * // Fetch zero or more NoteDeletions
+   * const noteDeletions = await prisma.noteDeletion.findMany()
+   * ```
+   */
+  get noteDeletion(): Prisma.NoteDeletionDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.account`: Exposes CRUD operations for the **Account** model.
@@ -312,8 +332,8 @@ export namespace Prisma {
   export import Exact = $Public.Exact;
 
   /**
-   * Prisma Client JS version: 7.3.0
-   * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
+   * Prisma Client JS version: 7.7.0
+   * Query Engine version: 75cbdc1eb7150937890ad5465d861175c6624711
    */
   export type PrismaVersion = {
     client: string;
@@ -718,6 +738,7 @@ export namespace Prisma {
   export const ModelName: {
     Post: 'Post';
     Note: 'Note';
+    NoteDeletion: 'NoteDeletion';
     Account: 'Account';
     Session: 'Session';
     User: 'User';
@@ -747,6 +768,7 @@ export namespace Prisma {
       modelProps:
         | 'post'
         | 'note'
+        | 'noteDeletion'
         | 'account'
         | 'session'
         | 'user'
@@ -899,6 +921,82 @@ export namespace Prisma {
           count: {
             args: Prisma.NoteCountArgs<ExtArgs>;
             result: $Utils.Optional<NoteCountAggregateOutputType> | number;
+          };
+        };
+      };
+      NoteDeletion: {
+        payload: Prisma.$NoteDeletionPayload<ExtArgs>;
+        fields: Prisma.NoteDeletionFieldRefs;
+        operations: {
+          findUnique: {
+            args: Prisma.NoteDeletionFindUniqueArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload> | null;
+          };
+          findUniqueOrThrow: {
+            args: Prisma.NoteDeletionFindUniqueOrThrowArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>;
+          };
+          findFirst: {
+            args: Prisma.NoteDeletionFindFirstArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload> | null;
+          };
+          findFirstOrThrow: {
+            args: Prisma.NoteDeletionFindFirstOrThrowArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>;
+          };
+          findMany: {
+            args: Prisma.NoteDeletionFindManyArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>[];
+          };
+          create: {
+            args: Prisma.NoteDeletionCreateArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>;
+          };
+          createMany: {
+            args: Prisma.NoteDeletionCreateManyArgs<ExtArgs>;
+            result: BatchPayload;
+          };
+          createManyAndReturn: {
+            args: Prisma.NoteDeletionCreateManyAndReturnArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>[];
+          };
+          delete: {
+            args: Prisma.NoteDeletionDeleteArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>;
+          };
+          update: {
+            args: Prisma.NoteDeletionUpdateArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>;
+          };
+          deleteMany: {
+            args: Prisma.NoteDeletionDeleteManyArgs<ExtArgs>;
+            result: BatchPayload;
+          };
+          updateMany: {
+            args: Prisma.NoteDeletionUpdateManyArgs<ExtArgs>;
+            result: BatchPayload;
+          };
+          updateManyAndReturn: {
+            args: Prisma.NoteDeletionUpdateManyAndReturnArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>[];
+          };
+          upsert: {
+            args: Prisma.NoteDeletionUpsertArgs<ExtArgs>;
+            result: $Utils.PayloadToResult<Prisma.$NoteDeletionPayload>;
+          };
+          aggregate: {
+            args: Prisma.NoteDeletionAggregateArgs<ExtArgs>;
+            result: $Utils.Optional<AggregateNoteDeletion>;
+          };
+          groupBy: {
+            args: Prisma.NoteDeletionGroupByArgs<ExtArgs>;
+            result: $Utils.Optional<NoteDeletionGroupByOutputType>[];
+          };
+          count: {
+            args: Prisma.NoteDeletionCountArgs<ExtArgs>;
+            result:
+              | $Utils.Optional<NoteDeletionCountAggregateOutputType>
+              | number;
           };
         };
       };
@@ -1314,6 +1412,7 @@ export namespace Prisma {
   export type GlobalOmitConfig = {
     post?: PostOmit;
     note?: NoteOmit;
+    noteDeletion?: NoteDeletionOmit;
     account?: AccountOmit;
     session?: SessionOmit;
     user?: UserOmit;
@@ -1402,6 +1501,7 @@ export namespace Prisma {
   export type UserCountOutputType = {
     posts: number;
     notes: number;
+    noteDeletions: number;
     accounts: number;
     sessions: number;
   };
@@ -1411,6 +1511,7 @@ export namespace Prisma {
   > = {
     posts?: boolean | UserCountOutputTypeCountPostsArgs;
     notes?: boolean | UserCountOutputTypeCountNotesArgs;
+    noteDeletions?: boolean | UserCountOutputTypeCountNoteDeletionsArgs;
     accounts?: boolean | UserCountOutputTypeCountAccountsArgs;
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs;
   };
@@ -1444,6 +1545,15 @@ export namespace Prisma {
     ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
   > = {
     where?: NoteWhereInput;
+  };
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountNoteDeletionsArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    where?: NoteDeletionWhereInput;
   };
 
   /**
@@ -2520,6 +2630,11 @@ export namespace Prisma {
      * Skip the first `n` Posts.
      */
     skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Posts.
+     */
     distinct?: PostScalarFieldEnum | PostScalarFieldEnum[];
   };
 
@@ -2807,6 +2922,7 @@ export namespace Prisma {
     hasContent: boolean | null;
     authorId: string | null;
     createdAt: Date | null;
+    updatedAt: Date | null;
     sort: number | null;
     priority: number | null;
     isBold: boolean | null;
@@ -2822,6 +2938,7 @@ export namespace Prisma {
     hasContent: boolean | null;
     authorId: string | null;
     createdAt: Date | null;
+    updatedAt: Date | null;
     sort: number | null;
     priority: number | null;
     isBold: boolean | null;
@@ -2837,6 +2954,7 @@ export namespace Prisma {
     hasContent: number;
     authorId: number;
     createdAt: number;
+    updatedAt: number;
     sort: number;
     priority: number;
     isBold: number;
@@ -2863,6 +2981,7 @@ export namespace Prisma {
     hasContent?: true;
     authorId?: true;
     createdAt?: true;
+    updatedAt?: true;
     sort?: true;
     priority?: true;
     isBold?: true;
@@ -2878,6 +2997,7 @@ export namespace Prisma {
     hasContent?: true;
     authorId?: true;
     createdAt?: true;
+    updatedAt?: true;
     sort?: true;
     priority?: true;
     isBold?: true;
@@ -2893,6 +3013,7 @@ export namespace Prisma {
     hasContent?: true;
     authorId?: true;
     createdAt?: true;
+    updatedAt?: true;
     sort?: true;
     priority?: true;
     isBold?: true;
@@ -2998,6 +3119,7 @@ export namespace Prisma {
     hasContent: boolean;
     authorId: string | null;
     createdAt: Date;
+    updatedAt: Date;
     sort: number;
     priority: number | null;
     isBold: boolean;
@@ -3033,6 +3155,7 @@ export namespace Prisma {
       hasContent?: boolean;
       authorId?: boolean;
       createdAt?: boolean;
+      updatedAt?: boolean;
       sort?: boolean;
       priority?: boolean;
       isBold?: boolean;
@@ -3054,6 +3177,7 @@ export namespace Prisma {
       hasContent?: boolean;
       authorId?: boolean;
       createdAt?: boolean;
+      updatedAt?: boolean;
       sort?: boolean;
       priority?: boolean;
       isBold?: boolean;
@@ -3075,6 +3199,7 @@ export namespace Prisma {
       hasContent?: boolean;
       authorId?: boolean;
       createdAt?: boolean;
+      updatedAt?: boolean;
       sort?: boolean;
       priority?: boolean;
       isBold?: boolean;
@@ -3093,6 +3218,7 @@ export namespace Prisma {
     hasContent?: boolean;
     authorId?: boolean;
     createdAt?: boolean;
+    updatedAt?: boolean;
     sort?: boolean;
     priority?: boolean;
     isBold?: boolean;
@@ -3110,6 +3236,7 @@ export namespace Prisma {
     | 'hasContent'
     | 'authorId'
     | 'createdAt'
+    | 'updatedAt'
     | 'sort'
     | 'priority'
     | 'isBold'
@@ -3149,6 +3276,7 @@ export namespace Prisma {
         hasContent: boolean;
         authorId: string | null;
         createdAt: Date;
+        updatedAt: Date;
         sort: number;
         priority: number | null;
         isBold: boolean;
@@ -3759,6 +3887,7 @@ export namespace Prisma {
     readonly hasContent: FieldRef<'Note', 'Boolean'>;
     readonly authorId: FieldRef<'Note', 'String'>;
     readonly createdAt: FieldRef<'Note', 'DateTime'>;
+    readonly updatedAt: FieldRef<'Note', 'DateTime'>;
     readonly sort: FieldRef<'Note', 'Int'>;
     readonly priority: FieldRef<'Note', 'Int'>;
     readonly isBold: FieldRef<'Note', 'Boolean'>;
@@ -3970,6 +4099,11 @@ export namespace Prisma {
      * Skip the first `n` Notes.
      */
     skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Notes.
+     */
     distinct?: NoteScalarFieldEnum | NoteScalarFieldEnum[];
   };
 
@@ -4226,6 +4360,1311 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: NoteInclude<ExtArgs> | null;
+  };
+
+  /**
+   * Model NoteDeletion
+   */
+
+  export type AggregateNoteDeletion = {
+    _count: NoteDeletionCountAggregateOutputType | null;
+    _min: NoteDeletionMinAggregateOutputType | null;
+    _max: NoteDeletionMaxAggregateOutputType | null;
+  };
+
+  export type NoteDeletionMinAggregateOutputType = {
+    id: string | null;
+    noteId: string | null;
+    authorId: string | null;
+    deletedAt: Date | null;
+  };
+
+  export type NoteDeletionMaxAggregateOutputType = {
+    id: string | null;
+    noteId: string | null;
+    authorId: string | null;
+    deletedAt: Date | null;
+  };
+
+  export type NoteDeletionCountAggregateOutputType = {
+    id: number;
+    noteId: number;
+    authorId: number;
+    deletedAt: number;
+    _all: number;
+  };
+
+  export type NoteDeletionMinAggregateInputType = {
+    id?: true;
+    noteId?: true;
+    authorId?: true;
+    deletedAt?: true;
+  };
+
+  export type NoteDeletionMaxAggregateInputType = {
+    id?: true;
+    noteId?: true;
+    authorId?: true;
+    deletedAt?: true;
+  };
+
+  export type NoteDeletionCountAggregateInputType = {
+    id?: true;
+    noteId?: true;
+    authorId?: true;
+    deletedAt?: true;
+    _all?: true;
+  };
+
+  export type NoteDeletionAggregateArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Filter which NoteDeletion to aggregate.
+     */
+    where?: NoteDeletionWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of NoteDeletions to fetch.
+     */
+    orderBy?:
+      | NoteDeletionOrderByWithRelationInput
+      | NoteDeletionOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: NoteDeletionWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` NoteDeletions from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` NoteDeletions.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned NoteDeletions
+     **/
+    _count?: true | NoteDeletionCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+     **/
+    _min?: NoteDeletionMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+     **/
+    _max?: NoteDeletionMaxAggregateInputType;
+  };
+
+  export type GetNoteDeletionAggregateType<
+    T extends NoteDeletionAggregateArgs,
+  > = {
+    [P in keyof T & keyof AggregateNoteDeletion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateNoteDeletion[P]>
+      : GetScalarType<T[P], AggregateNoteDeletion[P]>;
+  };
+
+  export type NoteDeletionGroupByArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    where?: NoteDeletionWhereInput;
+    orderBy?:
+      | NoteDeletionOrderByWithAggregationInput
+      | NoteDeletionOrderByWithAggregationInput[];
+    by: NoteDeletionScalarFieldEnum[] | NoteDeletionScalarFieldEnum;
+    having?: NoteDeletionScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: NoteDeletionCountAggregateInputType | true;
+    _min?: NoteDeletionMinAggregateInputType;
+    _max?: NoteDeletionMaxAggregateInputType;
+  };
+
+  export type NoteDeletionGroupByOutputType = {
+    id: string;
+    noteId: string;
+    authorId: string;
+    deletedAt: Date;
+    _count: NoteDeletionCountAggregateOutputType | null;
+    _min: NoteDeletionMinAggregateOutputType | null;
+    _max: NoteDeletionMaxAggregateOutputType | null;
+  };
+
+  type GetNoteDeletionGroupByPayload<T extends NoteDeletionGroupByArgs> =
+    Prisma.PrismaPromise<
+      Array<
+        PickEnumerable<NoteDeletionGroupByOutputType, T['by']> & {
+          [P in keyof T &
+            keyof NoteDeletionGroupByOutputType]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], NoteDeletionGroupByOutputType[P]>
+            : GetScalarType<T[P], NoteDeletionGroupByOutputType[P]>;
+        }
+      >
+    >;
+
+  export type NoteDeletionSelect<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = $Extensions.GetSelect<
+    {
+      id?: boolean;
+      noteId?: boolean;
+      authorId?: boolean;
+      deletedAt?: boolean;
+      author?: boolean | UserDefaultArgs<ExtArgs>;
+    },
+    ExtArgs['result']['noteDeletion']
+  >;
+
+  export type NoteDeletionSelectCreateManyAndReturn<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = $Extensions.GetSelect<
+    {
+      id?: boolean;
+      noteId?: boolean;
+      authorId?: boolean;
+      deletedAt?: boolean;
+      author?: boolean | UserDefaultArgs<ExtArgs>;
+    },
+    ExtArgs['result']['noteDeletion']
+  >;
+
+  export type NoteDeletionSelectUpdateManyAndReturn<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = $Extensions.GetSelect<
+    {
+      id?: boolean;
+      noteId?: boolean;
+      authorId?: boolean;
+      deletedAt?: boolean;
+      author?: boolean | UserDefaultArgs<ExtArgs>;
+    },
+    ExtArgs['result']['noteDeletion']
+  >;
+
+  export type NoteDeletionSelectScalar = {
+    id?: boolean;
+    noteId?: boolean;
+    authorId?: boolean;
+    deletedAt?: boolean;
+  };
+
+  export type NoteDeletionOmit<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = $Extensions.GetOmit<
+    'id' | 'noteId' | 'authorId' | 'deletedAt',
+    ExtArgs['result']['noteDeletion']
+  >;
+  export type NoteDeletionInclude<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    author?: boolean | UserDefaultArgs<ExtArgs>;
+  };
+  export type NoteDeletionIncludeCreateManyAndReturn<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    author?: boolean | UserDefaultArgs<ExtArgs>;
+  };
+  export type NoteDeletionIncludeUpdateManyAndReturn<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    author?: boolean | UserDefaultArgs<ExtArgs>;
+  };
+
+  export type $NoteDeletionPayload<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    name: 'NoteDeletion';
+    objects: {
+      author: Prisma.$UserPayload<ExtArgs>;
+    };
+    scalars: $Extensions.GetPayloadResult<
+      {
+        id: string;
+        noteId: string;
+        authorId: string;
+        deletedAt: Date;
+      },
+      ExtArgs['result']['noteDeletion']
+    >;
+    composites: {};
+  };
+
+  type NoteDeletionGetPayload<
+    S extends boolean | null | undefined | NoteDeletionDefaultArgs,
+  > = $Result.GetResult<Prisma.$NoteDeletionPayload, S>;
+
+  type NoteDeletionCountArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = Omit<
+    NoteDeletionFindManyArgs,
+    'select' | 'include' | 'distinct' | 'omit'
+  > & {
+    select?: NoteDeletionCountAggregateInputType | true;
+  };
+
+  export interface NoteDeletionDelegate<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+    GlobalOmitOptions = {},
+  > {
+    [K: symbol]: {
+      types: Prisma.TypeMap<ExtArgs>['model']['NoteDeletion'];
+      meta: { name: 'NoteDeletion' };
+    };
+    /**
+     * Find zero or one NoteDeletion that matches the filter.
+     * @param {NoteDeletionFindUniqueArgs} args - Arguments to find a NoteDeletion
+     * @example
+     * // Get one NoteDeletion
+     * const noteDeletion = await prisma.noteDeletion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends NoteDeletionFindUniqueArgs>(
+      args: SelectSubset<T, NoteDeletionFindUniqueArgs<ExtArgs>>,
+    ): Prisma__NoteDeletionClient<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'findUnique',
+        GlobalOmitOptions
+      > | null,
+      null,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+
+    /**
+     * Find one NoteDeletion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {NoteDeletionFindUniqueOrThrowArgs} args - Arguments to find a NoteDeletion
+     * @example
+     * // Get one NoteDeletion
+     * const noteDeletion = await prisma.noteDeletion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends NoteDeletionFindUniqueOrThrowArgs>(
+      args: SelectSubset<T, NoteDeletionFindUniqueOrThrowArgs<ExtArgs>>,
+    ): Prisma__NoteDeletionClient<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'findUniqueOrThrow',
+        GlobalOmitOptions
+      >,
+      never,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+
+    /**
+     * Find the first NoteDeletion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NoteDeletionFindFirstArgs} args - Arguments to find a NoteDeletion
+     * @example
+     * // Get one NoteDeletion
+     * const noteDeletion = await prisma.noteDeletion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends NoteDeletionFindFirstArgs>(
+      args?: SelectSubset<T, NoteDeletionFindFirstArgs<ExtArgs>>,
+    ): Prisma__NoteDeletionClient<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'findFirst',
+        GlobalOmitOptions
+      > | null,
+      null,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+
+    /**
+     * Find the first NoteDeletion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NoteDeletionFindFirstOrThrowArgs} args - Arguments to find a NoteDeletion
+     * @example
+     * // Get one NoteDeletion
+     * const noteDeletion = await prisma.noteDeletion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends NoteDeletionFindFirstOrThrowArgs>(
+      args?: SelectSubset<T, NoteDeletionFindFirstOrThrowArgs<ExtArgs>>,
+    ): Prisma__NoteDeletionClient<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'findFirstOrThrow',
+        GlobalOmitOptions
+      >,
+      never,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+
+    /**
+     * Find zero or more NoteDeletions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NoteDeletionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all NoteDeletions
+     * const noteDeletions = await prisma.noteDeletion.findMany()
+     *
+     * // Get first 10 NoteDeletions
+     * const noteDeletions = await prisma.noteDeletion.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const noteDeletionWithIdOnly = await prisma.noteDeletion.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends NoteDeletionFindManyArgs>(
+      args?: SelectSubset<T, NoteDeletionFindManyArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'findMany',
+        GlobalOmitOptions
+      >
+    >;
+
+    /**
+     * Create a NoteDeletion.
+     * @param {NoteDeletionCreateArgs} args - Arguments to create a NoteDeletion.
+     * @example
+     * // Create one NoteDeletion
+     * const NoteDeletion = await prisma.noteDeletion.create({
+     *   data: {
+     *     // ... data to create a NoteDeletion
+     *   }
+     * })
+     *
+     */
+    create<T extends NoteDeletionCreateArgs>(
+      args: SelectSubset<T, NoteDeletionCreateArgs<ExtArgs>>,
+    ): Prisma__NoteDeletionClient<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'create',
+        GlobalOmitOptions
+      >,
+      never,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+
+    /**
+     * Create many NoteDeletions.
+     * @param {NoteDeletionCreateManyArgs} args - Arguments to create many NoteDeletions.
+     * @example
+     * // Create many NoteDeletions
+     * const noteDeletion = await prisma.noteDeletion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends NoteDeletionCreateManyArgs>(
+      args?: SelectSubset<T, NoteDeletionCreateManyArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<BatchPayload>;
+
+    /**
+     * Create many NoteDeletions and returns the data saved in the database.
+     * @param {NoteDeletionCreateManyAndReturnArgs} args - Arguments to create many NoteDeletions.
+     * @example
+     * // Create many NoteDeletions
+     * const noteDeletion = await prisma.noteDeletion.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many NoteDeletions and only return the `id`
+     * const noteDeletionWithIdOnly = await prisma.noteDeletion.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends NoteDeletionCreateManyAndReturnArgs>(
+      args?: SelectSubset<T, NoteDeletionCreateManyAndReturnArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'createManyAndReturn',
+        GlobalOmitOptions
+      >
+    >;
+
+    /**
+     * Delete a NoteDeletion.
+     * @param {NoteDeletionDeleteArgs} args - Arguments to delete one NoteDeletion.
+     * @example
+     * // Delete one NoteDeletion
+     * const NoteDeletion = await prisma.noteDeletion.delete({
+     *   where: {
+     *     // ... filter to delete one NoteDeletion
+     *   }
+     * })
+     *
+     */
+    delete<T extends NoteDeletionDeleteArgs>(
+      args: SelectSubset<T, NoteDeletionDeleteArgs<ExtArgs>>,
+    ): Prisma__NoteDeletionClient<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'delete',
+        GlobalOmitOptions
+      >,
+      never,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+
+    /**
+     * Update one NoteDeletion.
+     * @param {NoteDeletionUpdateArgs} args - Arguments to update one NoteDeletion.
+     * @example
+     * // Update one NoteDeletion
+     * const noteDeletion = await prisma.noteDeletion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends NoteDeletionUpdateArgs>(
+      args: SelectSubset<T, NoteDeletionUpdateArgs<ExtArgs>>,
+    ): Prisma__NoteDeletionClient<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'update',
+        GlobalOmitOptions
+      >,
+      never,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+
+    /**
+     * Delete zero or more NoteDeletions.
+     * @param {NoteDeletionDeleteManyArgs} args - Arguments to filter NoteDeletions to delete.
+     * @example
+     * // Delete a few NoteDeletions
+     * const { count } = await prisma.noteDeletion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends NoteDeletionDeleteManyArgs>(
+      args?: SelectSubset<T, NoteDeletionDeleteManyArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<BatchPayload>;
+
+    /**
+     * Update zero or more NoteDeletions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NoteDeletionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many NoteDeletions
+     * const noteDeletion = await prisma.noteDeletion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends NoteDeletionUpdateManyArgs>(
+      args: SelectSubset<T, NoteDeletionUpdateManyArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<BatchPayload>;
+
+    /**
+     * Update zero or more NoteDeletions and returns the data updated in the database.
+     * @param {NoteDeletionUpdateManyAndReturnArgs} args - Arguments to update many NoteDeletions.
+     * @example
+     * // Update many NoteDeletions
+     * const noteDeletion = await prisma.noteDeletion.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more NoteDeletions and only return the `id`
+     * const noteDeletionWithIdOnly = await prisma.noteDeletion.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends NoteDeletionUpdateManyAndReturnArgs>(
+      args: SelectSubset<T, NoteDeletionUpdateManyAndReturnArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'updateManyAndReturn',
+        GlobalOmitOptions
+      >
+    >;
+
+    /**
+     * Create or update one NoteDeletion.
+     * @param {NoteDeletionUpsertArgs} args - Arguments to update or create a NoteDeletion.
+     * @example
+     * // Update or create a NoteDeletion
+     * const noteDeletion = await prisma.noteDeletion.upsert({
+     *   create: {
+     *     // ... data to create a NoteDeletion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the NoteDeletion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends NoteDeletionUpsertArgs>(
+      args: SelectSubset<T, NoteDeletionUpsertArgs<ExtArgs>>,
+    ): Prisma__NoteDeletionClient<
+      $Result.GetResult<
+        Prisma.$NoteDeletionPayload<ExtArgs>,
+        T,
+        'upsert',
+        GlobalOmitOptions
+      >,
+      never,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+
+    /**
+     * Count the number of NoteDeletions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NoteDeletionCountArgs} args - Arguments to filter NoteDeletions to count.
+     * @example
+     * // Count the number of NoteDeletions
+     * const count = await prisma.noteDeletion.count({
+     *   where: {
+     *     // ... the filter for the NoteDeletions we want to count
+     *   }
+     * })
+     **/
+    count<T extends NoteDeletionCountArgs>(
+      args?: Subset<T, NoteDeletionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], NoteDeletionCountAggregateOutputType>
+        : number
+    >;
+
+    /**
+     * Allows you to perform aggregations operations on a NoteDeletion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NoteDeletionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+     **/
+    aggregate<T extends NoteDeletionAggregateArgs>(
+      args: Subset<T, NoteDeletionAggregateArgs>,
+    ): Prisma.PrismaPromise<GetNoteDeletionAggregateType<T>>;
+
+    /**
+     * Group by NoteDeletion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {NoteDeletionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+     **/
+    groupBy<
+      T extends NoteDeletionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: NoteDeletionGroupByArgs['orderBy'] }
+        : { orderBy?: NoteDeletionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<
+        Keys<MaybeTupleToUnion<T['orderBy']>>
+      >,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+        ? `Error: "by" must not be empty.`
+        : HavingValid extends False
+          ? {
+              [P in HavingFields]: P extends ByFields
+                ? never
+                : P extends string
+                  ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+                  : [
+                      Error,
+                      'Field ',
+                      P,
+                      ` in "having" needs to be provided in "by"`,
+                    ];
+            }[HavingFields]
+          : 'take' extends Keys<T>
+            ? 'orderBy' extends Keys<T>
+              ? ByValid extends True
+                ? {}
+                : {
+                    [P in OrderFields]: P extends ByFields
+                      ? never
+                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+                  }[OrderFields]
+              : 'Error: If you provide "take", you also need to provide "orderBy"'
+            : 'skip' extends Keys<T>
+              ? 'orderBy' extends Keys<T>
+                ? ByValid extends True
+                  ? {}
+                  : {
+                      [P in OrderFields]: P extends ByFields
+                        ? never
+                        : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+                    }[OrderFields]
+                : 'Error: If you provide "skip", you also need to provide "orderBy"'
+              : ByValid extends True
+                ? {}
+                : {
+                    [P in OrderFields]: P extends ByFields
+                      ? never
+                      : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+                  }[OrderFields],
+    >(
+      args: SubsetIntersection<T, NoteDeletionGroupByArgs, OrderByArg> &
+        InputErrors,
+    ): {} extends InputErrors
+      ? GetNoteDeletionGroupByPayload<T>
+      : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the NoteDeletion model
+     */
+    readonly fields: NoteDeletionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for NoteDeletion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__NoteDeletionClient<
+    T,
+    Null = never,
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+    GlobalOmitOptions = {},
+  > extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+    author<T extends UserDefaultArgs<ExtArgs> = {}>(
+      args?: Subset<T, UserDefaultArgs<ExtArgs>>,
+    ): Prisma__UserClient<
+      | $Result.GetResult<
+          Prisma.$UserPayload<ExtArgs>,
+          T,
+          'findUniqueOrThrow',
+          GlobalOmitOptions
+        >
+      | Null,
+      Null,
+      ExtArgs,
+      GlobalOmitOptions
+    >;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(
+      onfulfilled?:
+        | ((value: T) => TResult1 | PromiseLike<TResult1>)
+        | undefined
+        | null,
+      onrejected?:
+        | ((reason: any) => TResult2 | PromiseLike<TResult2>)
+        | undefined
+        | null,
+    ): $Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(
+      onrejected?:
+        | ((reason: any) => TResult | PromiseLike<TResult>)
+        | undefined
+        | null,
+    ): $Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>;
+  }
+
+  /**
+   * Fields of the NoteDeletion model
+   */
+  interface NoteDeletionFieldRefs {
+    readonly id: FieldRef<'NoteDeletion', 'String'>;
+    readonly noteId: FieldRef<'NoteDeletion', 'String'>;
+    readonly authorId: FieldRef<'NoteDeletion', 'String'>;
+    readonly deletedAt: FieldRef<'NoteDeletion', 'DateTime'>;
+  }
+
+  // Custom InputTypes
+  /**
+   * NoteDeletion findUnique
+   */
+  export type NoteDeletionFindUniqueArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * Filter, which NoteDeletion to fetch.
+     */
+    where: NoteDeletionWhereUniqueInput;
+  };
+
+  /**
+   * NoteDeletion findUniqueOrThrow
+   */
+  export type NoteDeletionFindUniqueOrThrowArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * Filter, which NoteDeletion to fetch.
+     */
+    where: NoteDeletionWhereUniqueInput;
+  };
+
+  /**
+   * NoteDeletion findFirst
+   */
+  export type NoteDeletionFindFirstArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * Filter, which NoteDeletion to fetch.
+     */
+    where?: NoteDeletionWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of NoteDeletions to fetch.
+     */
+    orderBy?:
+      | NoteDeletionOrderByWithRelationInput
+      | NoteDeletionOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for NoteDeletions.
+     */
+    cursor?: NoteDeletionWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` NoteDeletions from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` NoteDeletions.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of NoteDeletions.
+     */
+    distinct?: NoteDeletionScalarFieldEnum | NoteDeletionScalarFieldEnum[];
+  };
+
+  /**
+   * NoteDeletion findFirstOrThrow
+   */
+  export type NoteDeletionFindFirstOrThrowArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * Filter, which NoteDeletion to fetch.
+     */
+    where?: NoteDeletionWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of NoteDeletions to fetch.
+     */
+    orderBy?:
+      | NoteDeletionOrderByWithRelationInput
+      | NoteDeletionOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for NoteDeletions.
+     */
+    cursor?: NoteDeletionWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` NoteDeletions from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` NoteDeletions.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of NoteDeletions.
+     */
+    distinct?: NoteDeletionScalarFieldEnum | NoteDeletionScalarFieldEnum[];
+  };
+
+  /**
+   * NoteDeletion findMany
+   */
+  export type NoteDeletionFindManyArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * Filter, which NoteDeletions to fetch.
+     */
+    where?: NoteDeletionWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of NoteDeletions to fetch.
+     */
+    orderBy?:
+      | NoteDeletionOrderByWithRelationInput
+      | NoteDeletionOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing NoteDeletions.
+     */
+    cursor?: NoteDeletionWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` NoteDeletions from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` NoteDeletions.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of NoteDeletions.
+     */
+    distinct?: NoteDeletionScalarFieldEnum | NoteDeletionScalarFieldEnum[];
+  };
+
+  /**
+   * NoteDeletion create
+   */
+  export type NoteDeletionCreateArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a NoteDeletion.
+     */
+    data: XOR<NoteDeletionCreateInput, NoteDeletionUncheckedCreateInput>;
+  };
+
+  /**
+   * NoteDeletion createMany
+   */
+  export type NoteDeletionCreateManyArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * The data used to create many NoteDeletions.
+     */
+    data: NoteDeletionCreateManyInput | NoteDeletionCreateManyInput[];
+    skipDuplicates?: boolean;
+  };
+
+  /**
+   * NoteDeletion createManyAndReturn
+   */
+  export type NoteDeletionCreateManyAndReturnArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelectCreateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * The data used to create many NoteDeletions.
+     */
+    data: NoteDeletionCreateManyInput | NoteDeletionCreateManyInput[];
+    skipDuplicates?: boolean;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionIncludeCreateManyAndReturn<ExtArgs> | null;
+  };
+
+  /**
+   * NoteDeletion update
+   */
+  export type NoteDeletionUpdateArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a NoteDeletion.
+     */
+    data: XOR<NoteDeletionUpdateInput, NoteDeletionUncheckedUpdateInput>;
+    /**
+     * Choose, which NoteDeletion to update.
+     */
+    where: NoteDeletionWhereUniqueInput;
+  };
+
+  /**
+   * NoteDeletion updateMany
+   */
+  export type NoteDeletionUpdateManyArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * The data used to update NoteDeletions.
+     */
+    data: XOR<
+      NoteDeletionUpdateManyMutationInput,
+      NoteDeletionUncheckedUpdateManyInput
+    >;
+    /**
+     * Filter which NoteDeletions to update
+     */
+    where?: NoteDeletionWhereInput;
+    /**
+     * Limit how many NoteDeletions to update.
+     */
+    limit?: number;
+  };
+
+  /**
+   * NoteDeletion updateManyAndReturn
+   */
+  export type NoteDeletionUpdateManyAndReturnArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelectUpdateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * The data used to update NoteDeletions.
+     */
+    data: XOR<
+      NoteDeletionUpdateManyMutationInput,
+      NoteDeletionUncheckedUpdateManyInput
+    >;
+    /**
+     * Filter which NoteDeletions to update
+     */
+    where?: NoteDeletionWhereInput;
+    /**
+     * Limit how many NoteDeletions to update.
+     */
+    limit?: number;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionIncludeUpdateManyAndReturn<ExtArgs> | null;
+  };
+
+  /**
+   * NoteDeletion upsert
+   */
+  export type NoteDeletionUpsertArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the NoteDeletion to update in case it exists.
+     */
+    where: NoteDeletionWhereUniqueInput;
+    /**
+     * In case the NoteDeletion found by the `where` argument doesn't exist, create a new NoteDeletion with this data.
+     */
+    create: XOR<NoteDeletionCreateInput, NoteDeletionUncheckedCreateInput>;
+    /**
+     * In case the NoteDeletion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<NoteDeletionUpdateInput, NoteDeletionUncheckedUpdateInput>;
+  };
+
+  /**
+   * NoteDeletion delete
+   */
+  export type NoteDeletionDeleteArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    /**
+     * Filter which NoteDeletion to delete.
+     */
+    where: NoteDeletionWhereUniqueInput;
+  };
+
+  /**
+   * NoteDeletion deleteMany
+   */
+  export type NoteDeletionDeleteManyArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Filter which NoteDeletions to delete
+     */
+    where?: NoteDeletionWhereInput;
+    /**
+     * Limit how many NoteDeletions to delete.
+     */
+    limit?: number;
+  };
+
+  /**
+   * NoteDeletion without action
+   */
+  export type NoteDeletionDefaultArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
   };
 
   /**
@@ -5455,6 +6894,11 @@ export namespace Prisma {
      * Skip the first `n` Accounts.
      */
     skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Accounts.
+     */
     distinct?: AccountScalarFieldEnum | AccountScalarFieldEnum[];
   };
 
@@ -6742,6 +8186,11 @@ export namespace Prisma {
      * Skip the first `n` Sessions.
      */
     skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Sessions.
+     */
     distinct?: SessionScalarFieldEnum | SessionScalarFieldEnum[];
   };
 
@@ -7164,6 +8613,7 @@ export namespace Prisma {
       updatedAt?: boolean;
       posts?: boolean | User$postsArgs<ExtArgs>;
       notes?: boolean | User$notesArgs<ExtArgs>;
+      noteDeletions?: boolean | User$noteDeletionsArgs<ExtArgs>;
       accounts?: boolean | User$accountsArgs<ExtArgs>;
       sessions?: boolean | User$sessionsArgs<ExtArgs>;
       _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>;
@@ -7228,6 +8678,7 @@ export namespace Prisma {
   > = {
     posts?: boolean | User$postsArgs<ExtArgs>;
     notes?: boolean | User$notesArgs<ExtArgs>;
+    noteDeletions?: boolean | User$noteDeletionsArgs<ExtArgs>;
     accounts?: boolean | User$accountsArgs<ExtArgs>;
     sessions?: boolean | User$sessionsArgs<ExtArgs>;
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>;
@@ -7246,6 +8697,7 @@ export namespace Prisma {
     objects: {
       posts: Prisma.$PostPayload<ExtArgs>[];
       notes: Prisma.$NotePayload<ExtArgs>[];
+      noteDeletions: Prisma.$NoteDeletionPayload<ExtArgs>[];
       accounts: Prisma.$AccountPayload<ExtArgs>[];
       sessions: Prisma.$SessionPayload<ExtArgs>[];
     };
@@ -7825,6 +9277,17 @@ export namespace Prisma {
         >
       | Null
     >;
+    noteDeletions<T extends User$noteDeletionsArgs<ExtArgs> = {}>(
+      args?: Subset<T, User$noteDeletionsArgs<ExtArgs>>,
+    ): Prisma.PrismaPromise<
+      | $Result.GetResult<
+          Prisma.$NoteDeletionPayload<ExtArgs>,
+          T,
+          'findMany',
+          GlobalOmitOptions
+        >
+      | Null
+    >;
     accounts<T extends User$accountsArgs<ExtArgs> = {}>(
       args?: Subset<T, User$accountsArgs<ExtArgs>>,
     ): Prisma.PrismaPromise<
@@ -8099,6 +9562,11 @@ export namespace Prisma {
      * Skip the first `n` Users.
      */
     skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Users.
+     */
     distinct?: UserScalarFieldEnum | UserScalarFieldEnum[];
   };
 
@@ -8358,6 +9826,34 @@ export namespace Prisma {
     take?: number;
     skip?: number;
     distinct?: NoteScalarFieldEnum | NoteScalarFieldEnum[];
+  };
+
+  /**
+   * User.noteDeletions
+   */
+  export type User$noteDeletionsArgs<
+    ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs,
+  > = {
+    /**
+     * Select specific fields to fetch from the NoteDeletion
+     */
+    select?: NoteDeletionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the NoteDeletion
+     */
+    omit?: NoteDeletionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: NoteDeletionInclude<ExtArgs> | null;
+    where?: NoteDeletionWhereInput;
+    orderBy?:
+      | NoteDeletionOrderByWithRelationInput
+      | NoteDeletionOrderByWithRelationInput[];
+    cursor?: NoteDeletionWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: NoteDeletionScalarFieldEnum | NoteDeletionScalarFieldEnum[];
   };
 
   /**
@@ -9436,6 +10932,11 @@ export namespace Prisma {
      * Skip the first `n` VerificationTokens.
      */
     skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of VerificationTokens.
+     */
     distinct?:
       | VerificationTokenScalarFieldEnum
       | VerificationTokenScalarFieldEnum[];
@@ -9697,6 +11198,7 @@ export namespace Prisma {
     hasContent: 'hasContent';
     authorId: 'authorId';
     createdAt: 'createdAt';
+    updatedAt: 'updatedAt';
     sort: 'sort';
     priority: 'priority';
     isBold: 'isBold';
@@ -9707,6 +11209,16 @@ export namespace Prisma {
 
   export type NoteScalarFieldEnum =
     (typeof NoteScalarFieldEnum)[keyof typeof NoteScalarFieldEnum];
+
+  export const NoteDeletionScalarFieldEnum: {
+    id: 'id';
+    noteId: 'noteId';
+    authorId: 'authorId';
+    deletedAt: 'deletedAt';
+  };
+
+  export type NoteDeletionScalarFieldEnum =
+    (typeof NoteDeletionScalarFieldEnum)[keyof typeof NoteDeletionScalarFieldEnum];
 
   export const AccountScalarFieldEnum: {
     id: 'id';
@@ -9933,6 +11445,7 @@ export namespace Prisma {
     hasContent?: BoolFilter<'Note'> | boolean;
     authorId?: StringNullableFilter<'Note'> | string | null;
     createdAt?: DateTimeFilter<'Note'> | Date | string;
+    updatedAt?: DateTimeFilter<'Note'> | Date | string;
     sort?: IntFilter<'Note'> | number;
     priority?: IntNullableFilter<'Note'> | number | null;
     isBold?: BoolFilter<'Note'> | boolean;
@@ -9949,6 +11462,7 @@ export namespace Prisma {
     hasContent?: SortOrder;
     authorId?: SortOrderInput | SortOrder;
     createdAt?: SortOrder;
+    updatedAt?: SortOrder;
     sort?: SortOrder;
     priority?: SortOrderInput | SortOrder;
     isBold?: SortOrder;
@@ -9969,6 +11483,7 @@ export namespace Prisma {
       hasContent?: BoolFilter<'Note'> | boolean;
       authorId?: StringNullableFilter<'Note'> | string | null;
       createdAt?: DateTimeFilter<'Note'> | Date | string;
+      updatedAt?: DateTimeFilter<'Note'> | Date | string;
       sort?: IntFilter<'Note'> | number;
       priority?: IntNullableFilter<'Note'> | number | null;
       isBold?: BoolFilter<'Note'> | boolean;
@@ -9987,6 +11502,7 @@ export namespace Prisma {
     hasContent?: SortOrder;
     authorId?: SortOrderInput | SortOrder;
     createdAt?: SortOrder;
+    updatedAt?: SortOrder;
     sort?: SortOrder;
     priority?: SortOrderInput | SortOrder;
     isBold?: SortOrder;
@@ -10014,12 +11530,70 @@ export namespace Prisma {
     hasContent?: BoolWithAggregatesFilter<'Note'> | boolean;
     authorId?: StringNullableWithAggregatesFilter<'Note'> | string | null;
     createdAt?: DateTimeWithAggregatesFilter<'Note'> | Date | string;
+    updatedAt?: DateTimeWithAggregatesFilter<'Note'> | Date | string;
     sort?: IntWithAggregatesFilter<'Note'> | number;
     priority?: IntNullableWithAggregatesFilter<'Note'> | number | null;
     isBold?: BoolWithAggregatesFilter<'Note'> | boolean;
     parentId?: StringNullableWithAggregatesFilter<'Note'> | string | null;
     complete?: BoolWithAggregatesFilter<'Note'> | boolean;
     collapsed?: BoolWithAggregatesFilter<'Note'> | boolean;
+  };
+
+  export type NoteDeletionWhereInput = {
+    AND?: NoteDeletionWhereInput | NoteDeletionWhereInput[];
+    OR?: NoteDeletionWhereInput[];
+    NOT?: NoteDeletionWhereInput | NoteDeletionWhereInput[];
+    id?: StringFilter<'NoteDeletion'> | string;
+    noteId?: StringFilter<'NoteDeletion'> | string;
+    authorId?: StringFilter<'NoteDeletion'> | string;
+    deletedAt?: DateTimeFilter<'NoteDeletion'> | Date | string;
+    author?: XOR<UserScalarRelationFilter, UserWhereInput>;
+  };
+
+  export type NoteDeletionOrderByWithRelationInput = {
+    id?: SortOrder;
+    noteId?: SortOrder;
+    authorId?: SortOrder;
+    deletedAt?: SortOrder;
+    author?: UserOrderByWithRelationInput;
+  };
+
+  export type NoteDeletionWhereUniqueInput = Prisma.AtLeast<
+    {
+      id?: string;
+      AND?: NoteDeletionWhereInput | NoteDeletionWhereInput[];
+      OR?: NoteDeletionWhereInput[];
+      NOT?: NoteDeletionWhereInput | NoteDeletionWhereInput[];
+      noteId?: StringFilter<'NoteDeletion'> | string;
+      authorId?: StringFilter<'NoteDeletion'> | string;
+      deletedAt?: DateTimeFilter<'NoteDeletion'> | Date | string;
+      author?: XOR<UserScalarRelationFilter, UserWhereInput>;
+    },
+    'id'
+  >;
+
+  export type NoteDeletionOrderByWithAggregationInput = {
+    id?: SortOrder;
+    noteId?: SortOrder;
+    authorId?: SortOrder;
+    deletedAt?: SortOrder;
+    _count?: NoteDeletionCountOrderByAggregateInput;
+    _max?: NoteDeletionMaxOrderByAggregateInput;
+    _min?: NoteDeletionMinOrderByAggregateInput;
+  };
+
+  export type NoteDeletionScalarWhereWithAggregatesInput = {
+    AND?:
+      | NoteDeletionScalarWhereWithAggregatesInput
+      | NoteDeletionScalarWhereWithAggregatesInput[];
+    OR?: NoteDeletionScalarWhereWithAggregatesInput[];
+    NOT?:
+      | NoteDeletionScalarWhereWithAggregatesInput
+      | NoteDeletionScalarWhereWithAggregatesInput[];
+    id?: StringWithAggregatesFilter<'NoteDeletion'> | string;
+    noteId?: StringWithAggregatesFilter<'NoteDeletion'> | string;
+    authorId?: StringWithAggregatesFilter<'NoteDeletion'> | string;
+    deletedAt?: DateTimeWithAggregatesFilter<'NoteDeletion'> | Date | string;
   };
 
   export type AccountWhereInput = {
@@ -10214,6 +11788,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<'User'> | Date | string;
     posts?: PostListRelationFilter;
     notes?: NoteListRelationFilter;
+    noteDeletions?: NoteDeletionListRelationFilter;
     accounts?: AccountListRelationFilter;
     sessions?: SessionListRelationFilter;
   };
@@ -10228,6 +11803,7 @@ export namespace Prisma {
     updatedAt?: SortOrder;
     posts?: PostOrderByRelationAggregateInput;
     notes?: NoteOrderByRelationAggregateInput;
+    noteDeletions?: NoteDeletionOrderByRelationAggregateInput;
     accounts?: AccountOrderByRelationAggregateInput;
     sessions?: SessionOrderByRelationAggregateInput;
   };
@@ -10246,6 +11822,7 @@ export namespace Prisma {
       updatedAt?: DateTimeFilter<'User'> | Date | string;
       posts?: PostListRelationFilter;
       notes?: NoteListRelationFilter;
+      noteDeletions?: NoteDeletionListRelationFilter;
       accounts?: AccountListRelationFilter;
       sessions?: SessionListRelationFilter;
     },
@@ -10397,6 +11974,7 @@ export namespace Prisma {
     content?: string | null;
     hasContent?: boolean;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     sort?: number;
     priority?: number | null;
     isBold?: boolean;
@@ -10413,6 +11991,7 @@ export namespace Prisma {
     hasContent?: boolean;
     authorId?: string | null;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     sort?: number;
     priority?: number | null;
     isBold?: boolean;
@@ -10427,6 +12006,7 @@ export namespace Prisma {
     content?: NullableStringFieldUpdateOperationsInput | string | null;
     hasContent?: BoolFieldUpdateOperationsInput | boolean;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     sort?: IntFieldUpdateOperationsInput | number;
     priority?: NullableIntFieldUpdateOperationsInput | number | null;
     isBold?: BoolFieldUpdateOperationsInput | boolean;
@@ -10443,6 +12023,7 @@ export namespace Prisma {
     hasContent?: BoolFieldUpdateOperationsInput | boolean;
     authorId?: NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     sort?: IntFieldUpdateOperationsInput | number;
     priority?: NullableIntFieldUpdateOperationsInput | number | null;
     isBold?: BoolFieldUpdateOperationsInput | boolean;
@@ -10458,6 +12039,7 @@ export namespace Prisma {
     hasContent?: boolean;
     authorId?: string | null;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     sort?: number;
     priority?: number | null;
     isBold?: boolean;
@@ -10472,6 +12054,7 @@ export namespace Prisma {
     content?: NullableStringFieldUpdateOperationsInput | string | null;
     hasContent?: BoolFieldUpdateOperationsInput | boolean;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     sort?: IntFieldUpdateOperationsInput | number;
     priority?: NullableIntFieldUpdateOperationsInput | number | null;
     isBold?: BoolFieldUpdateOperationsInput | boolean;
@@ -10487,12 +12070,61 @@ export namespace Prisma {
     hasContent?: BoolFieldUpdateOperationsInput | boolean;
     authorId?: NullableStringFieldUpdateOperationsInput | string | null;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     sort?: IntFieldUpdateOperationsInput | number;
     priority?: NullableIntFieldUpdateOperationsInput | number | null;
     isBold?: BoolFieldUpdateOperationsInput | boolean;
     parentId?: NullableStringFieldUpdateOperationsInput | string | null;
     complete?: BoolFieldUpdateOperationsInput | boolean;
     collapsed?: BoolFieldUpdateOperationsInput | boolean;
+  };
+
+  export type NoteDeletionCreateInput = {
+    id?: string;
+    noteId: string;
+    deletedAt?: Date | string;
+    author: UserCreateNestedOneWithoutNoteDeletionsInput;
+  };
+
+  export type NoteDeletionUncheckedCreateInput = {
+    id?: string;
+    noteId: string;
+    authorId: string;
+    deletedAt?: Date | string;
+  };
+
+  export type NoteDeletionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    noteId?: StringFieldUpdateOperationsInput | string;
+    deletedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    author?: UserUpdateOneRequiredWithoutNoteDeletionsNestedInput;
+  };
+
+  export type NoteDeletionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    noteId?: StringFieldUpdateOperationsInput | string;
+    authorId?: StringFieldUpdateOperationsInput | string;
+    deletedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+  };
+
+  export type NoteDeletionCreateManyInput = {
+    id?: string;
+    noteId: string;
+    authorId: string;
+    deletedAt?: Date | string;
+  };
+
+  export type NoteDeletionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    noteId?: StringFieldUpdateOperationsInput | string;
+    deletedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+  };
+
+  export type NoteDeletionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    noteId?: StringFieldUpdateOperationsInput | string;
+    authorId?: StringFieldUpdateOperationsInput | string;
+    deletedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
   };
 
   export type AccountCreateInput = {
@@ -10683,6 +12315,7 @@ export namespace Prisma {
     updatedAt?: Date | string;
     posts?: PostCreateNestedManyWithoutAuthorInput;
     notes?: NoteCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionCreateNestedManyWithoutAuthorInput;
     accounts?: AccountCreateNestedManyWithoutUserInput;
     sessions?: SessionCreateNestedManyWithoutUserInput;
   };
@@ -10697,6 +12330,7 @@ export namespace Prisma {
     updatedAt?: Date | string;
     posts?: PostUncheckedCreateNestedManyWithoutAuthorInput;
     notes?: NoteUncheckedCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionUncheckedCreateNestedManyWithoutAuthorInput;
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput;
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput;
   };
@@ -10715,6 +12349,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     posts?: PostUpdateManyWithoutAuthorNestedInput;
     notes?: NoteUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUpdateManyWithoutAuthorNestedInput;
     accounts?: AccountUpdateManyWithoutUserNestedInput;
     sessions?: SessionUpdateManyWithoutUserNestedInput;
   };
@@ -10733,6 +12368,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     posts?: PostUncheckedUpdateManyWithoutAuthorNestedInput;
     notes?: NoteUncheckedUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUncheckedUpdateManyWithoutAuthorNestedInput;
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput;
   };
@@ -10973,6 +12609,7 @@ export namespace Prisma {
     hasContent?: SortOrder;
     authorId?: SortOrder;
     createdAt?: SortOrder;
+    updatedAt?: SortOrder;
     sort?: SortOrder;
     priority?: SortOrder;
     isBold?: SortOrder;
@@ -10993,6 +12630,7 @@ export namespace Prisma {
     hasContent?: SortOrder;
     authorId?: SortOrder;
     createdAt?: SortOrder;
+    updatedAt?: SortOrder;
     sort?: SortOrder;
     priority?: SortOrder;
     isBold?: SortOrder;
@@ -11008,6 +12646,7 @@ export namespace Prisma {
     hasContent?: SortOrder;
     authorId?: SortOrder;
     createdAt?: SortOrder;
+    updatedAt?: SortOrder;
     sort?: SortOrder;
     priority?: SortOrder;
     isBold?: SortOrder;
@@ -11070,6 +12709,27 @@ export namespace Prisma {
   export type UserScalarRelationFilter = {
     is?: UserWhereInput;
     isNot?: UserWhereInput;
+  };
+
+  export type NoteDeletionCountOrderByAggregateInput = {
+    id?: SortOrder;
+    noteId?: SortOrder;
+    authorId?: SortOrder;
+    deletedAt?: SortOrder;
+  };
+
+  export type NoteDeletionMaxOrderByAggregateInput = {
+    id?: SortOrder;
+    noteId?: SortOrder;
+    authorId?: SortOrder;
+    deletedAt?: SortOrder;
+  };
+
+  export type NoteDeletionMinOrderByAggregateInput = {
+    id?: SortOrder;
+    noteId?: SortOrder;
+    authorId?: SortOrder;
+    deletedAt?: SortOrder;
   };
 
   export type AccountProviderProviderAccountIdCompoundUniqueInput = {
@@ -11180,6 +12840,12 @@ export namespace Prisma {
     none?: NoteWhereInput;
   };
 
+  export type NoteDeletionListRelationFilter = {
+    every?: NoteDeletionWhereInput;
+    some?: NoteDeletionWhereInput;
+    none?: NoteDeletionWhereInput;
+  };
+
   export type AccountListRelationFilter = {
     every?: AccountWhereInput;
     some?: AccountWhereInput;
@@ -11197,6 +12863,10 @@ export namespace Prisma {
   };
 
   export type NoteOrderByRelationAggregateInput = {
+    _count?: SortOrder;
+  };
+
+  export type NoteDeletionOrderByRelationAggregateInput = {
     _count?: SortOrder;
   };
 
@@ -11367,6 +13037,32 @@ export namespace Prisma {
     >;
   };
 
+  export type UserCreateNestedOneWithoutNoteDeletionsInput = {
+    create?: XOR<
+      UserCreateWithoutNoteDeletionsInput,
+      UserUncheckedCreateWithoutNoteDeletionsInput
+    >;
+    connectOrCreate?: UserCreateOrConnectWithoutNoteDeletionsInput;
+    connect?: UserWhereUniqueInput;
+  };
+
+  export type UserUpdateOneRequiredWithoutNoteDeletionsNestedInput = {
+    create?: XOR<
+      UserCreateWithoutNoteDeletionsInput,
+      UserUncheckedCreateWithoutNoteDeletionsInput
+    >;
+    connectOrCreate?: UserCreateOrConnectWithoutNoteDeletionsInput;
+    upsert?: UserUpsertWithoutNoteDeletionsInput;
+    connect?: UserWhereUniqueInput;
+    update?: XOR<
+      XOR<
+        UserUpdateToOneWithWhereWithoutNoteDeletionsInput,
+        UserUpdateWithoutNoteDeletionsInput
+      >,
+      UserUncheckedUpdateWithoutNoteDeletionsInput
+    >;
+  };
+
   export type UserCreateNestedOneWithoutAccountsInput = {
     create?: XOR<
       UserCreateWithoutAccountsInput,
@@ -11443,6 +13139,21 @@ export namespace Prisma {
     connect?: NoteWhereUniqueInput | NoteWhereUniqueInput[];
   };
 
+  export type NoteDeletionCreateNestedManyWithoutAuthorInput = {
+    create?:
+      | XOR<
+          NoteDeletionCreateWithoutAuthorInput,
+          NoteDeletionUncheckedCreateWithoutAuthorInput
+        >
+      | NoteDeletionCreateWithoutAuthorInput[]
+      | NoteDeletionUncheckedCreateWithoutAuthorInput[];
+    connectOrCreate?:
+      | NoteDeletionCreateOrConnectWithoutAuthorInput
+      | NoteDeletionCreateOrConnectWithoutAuthorInput[];
+    createMany?: NoteDeletionCreateManyAuthorInputEnvelope;
+    connect?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+  };
+
   export type AccountCreateNestedManyWithoutUserInput = {
     create?:
       | XOR<
@@ -11495,6 +13206,21 @@ export namespace Prisma {
       | NoteCreateOrConnectWithoutAuthorInput[];
     createMany?: NoteCreateManyAuthorInputEnvelope;
     connect?: NoteWhereUniqueInput | NoteWhereUniqueInput[];
+  };
+
+  export type NoteDeletionUncheckedCreateNestedManyWithoutAuthorInput = {
+    create?:
+      | XOR<
+          NoteDeletionCreateWithoutAuthorInput,
+          NoteDeletionUncheckedCreateWithoutAuthorInput
+        >
+      | NoteDeletionCreateWithoutAuthorInput[]
+      | NoteDeletionUncheckedCreateWithoutAuthorInput[];
+    connectOrCreate?:
+      | NoteDeletionCreateOrConnectWithoutAuthorInput
+      | NoteDeletionCreateOrConnectWithoutAuthorInput[];
+    createMany?: NoteDeletionCreateManyAuthorInputEnvelope;
+    connect?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
   };
 
   export type AccountUncheckedCreateNestedManyWithoutUserInput = {
@@ -11579,6 +13305,34 @@ export namespace Prisma {
       | NoteUpdateManyWithWhereWithoutAuthorInput
       | NoteUpdateManyWithWhereWithoutAuthorInput[];
     deleteMany?: NoteScalarWhereInput | NoteScalarWhereInput[];
+  };
+
+  export type NoteDeletionUpdateManyWithoutAuthorNestedInput = {
+    create?:
+      | XOR<
+          NoteDeletionCreateWithoutAuthorInput,
+          NoteDeletionUncheckedCreateWithoutAuthorInput
+        >
+      | NoteDeletionCreateWithoutAuthorInput[]
+      | NoteDeletionUncheckedCreateWithoutAuthorInput[];
+    connectOrCreate?:
+      | NoteDeletionCreateOrConnectWithoutAuthorInput
+      | NoteDeletionCreateOrConnectWithoutAuthorInput[];
+    upsert?:
+      | NoteDeletionUpsertWithWhereUniqueWithoutAuthorInput
+      | NoteDeletionUpsertWithWhereUniqueWithoutAuthorInput[];
+    createMany?: NoteDeletionCreateManyAuthorInputEnvelope;
+    set?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+    disconnect?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+    delete?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+    connect?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+    update?:
+      | NoteDeletionUpdateWithWhereUniqueWithoutAuthorInput
+      | NoteDeletionUpdateWithWhereUniqueWithoutAuthorInput[];
+    updateMany?:
+      | NoteDeletionUpdateManyWithWhereWithoutAuthorInput
+      | NoteDeletionUpdateManyWithWhereWithoutAuthorInput[];
+    deleteMany?: NoteDeletionScalarWhereInput | NoteDeletionScalarWhereInput[];
   };
 
   export type AccountUpdateManyWithoutUserNestedInput = {
@@ -11685,6 +13439,34 @@ export namespace Prisma {
       | NoteUpdateManyWithWhereWithoutAuthorInput
       | NoteUpdateManyWithWhereWithoutAuthorInput[];
     deleteMany?: NoteScalarWhereInput | NoteScalarWhereInput[];
+  };
+
+  export type NoteDeletionUncheckedUpdateManyWithoutAuthorNestedInput = {
+    create?:
+      | XOR<
+          NoteDeletionCreateWithoutAuthorInput,
+          NoteDeletionUncheckedCreateWithoutAuthorInput
+        >
+      | NoteDeletionCreateWithoutAuthorInput[]
+      | NoteDeletionUncheckedCreateWithoutAuthorInput[];
+    connectOrCreate?:
+      | NoteDeletionCreateOrConnectWithoutAuthorInput
+      | NoteDeletionCreateOrConnectWithoutAuthorInput[];
+    upsert?:
+      | NoteDeletionUpsertWithWhereUniqueWithoutAuthorInput
+      | NoteDeletionUpsertWithWhereUniqueWithoutAuthorInput[];
+    createMany?: NoteDeletionCreateManyAuthorInputEnvelope;
+    set?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+    disconnect?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+    delete?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+    connect?: NoteDeletionWhereUniqueInput | NoteDeletionWhereUniqueInput[];
+    update?:
+      | NoteDeletionUpdateWithWhereUniqueWithoutAuthorInput
+      | NoteDeletionUpdateWithWhereUniqueWithoutAuthorInput[];
+    updateMany?:
+      | NoteDeletionUpdateManyWithWhereWithoutAuthorInput
+      | NoteDeletionUpdateManyWithWhereWithoutAuthorInput[];
+    deleteMany?: NoteDeletionScalarWhereInput | NoteDeletionScalarWhereInput[];
   };
 
   export type AccountUncheckedUpdateManyWithoutUserNestedInput = {
@@ -11965,6 +13747,7 @@ export namespace Prisma {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     notes?: NoteCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionCreateNestedManyWithoutAuthorInput;
     accounts?: AccountCreateNestedManyWithoutUserInput;
     sessions?: SessionCreateNestedManyWithoutUserInput;
   };
@@ -11978,6 +13761,7 @@ export namespace Prisma {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     notes?: NoteUncheckedCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionUncheckedCreateNestedManyWithoutAuthorInput;
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput;
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput;
   };
@@ -12023,6 +13807,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     notes?: NoteUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUpdateManyWithoutAuthorNestedInput;
     accounts?: AccountUpdateManyWithoutUserNestedInput;
     sessions?: SessionUpdateManyWithoutUserNestedInput;
   };
@@ -12040,6 +13825,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     notes?: NoteUncheckedUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUncheckedUpdateManyWithoutAuthorNestedInput;
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput;
   };
@@ -12053,6 +13839,7 @@ export namespace Prisma {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     posts?: PostCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionCreateNestedManyWithoutAuthorInput;
     accounts?: AccountCreateNestedManyWithoutUserInput;
     sessions?: SessionCreateNestedManyWithoutUserInput;
   };
@@ -12066,6 +13853,7 @@ export namespace Prisma {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     posts?: PostUncheckedCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionUncheckedCreateNestedManyWithoutAuthorInput;
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput;
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput;
   };
@@ -12111,6 +13899,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     posts?: PostUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUpdateManyWithoutAuthorNestedInput;
     accounts?: AccountUpdateManyWithoutUserNestedInput;
     sessions?: SessionUpdateManyWithoutUserNestedInput;
   };
@@ -12128,6 +13917,99 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     posts?: PostUncheckedUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUncheckedUpdateManyWithoutAuthorNestedInput;
+    accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput;
+    sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput;
+  };
+
+  export type UserCreateWithoutNoteDeletionsInput = {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    emailVerified?: Date | string | null;
+    image?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    posts?: PostCreateNestedManyWithoutAuthorInput;
+    notes?: NoteCreateNestedManyWithoutAuthorInput;
+    accounts?: AccountCreateNestedManyWithoutUserInput;
+    sessions?: SessionCreateNestedManyWithoutUserInput;
+  };
+
+  export type UserUncheckedCreateWithoutNoteDeletionsInput = {
+    id?: string;
+    name?: string | null;
+    email?: string | null;
+    emailVerified?: Date | string | null;
+    image?: string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    posts?: PostUncheckedCreateNestedManyWithoutAuthorInput;
+    notes?: NoteUncheckedCreateNestedManyWithoutAuthorInput;
+    accounts?: AccountUncheckedCreateNestedManyWithoutUserInput;
+    sessions?: SessionUncheckedCreateNestedManyWithoutUserInput;
+  };
+
+  export type UserCreateOrConnectWithoutNoteDeletionsInput = {
+    where: UserWhereUniqueInput;
+    create: XOR<
+      UserCreateWithoutNoteDeletionsInput,
+      UserUncheckedCreateWithoutNoteDeletionsInput
+    >;
+  };
+
+  export type UserUpsertWithoutNoteDeletionsInput = {
+    update: XOR<
+      UserUpdateWithoutNoteDeletionsInput,
+      UserUncheckedUpdateWithoutNoteDeletionsInput
+    >;
+    create: XOR<
+      UserCreateWithoutNoteDeletionsInput,
+      UserUncheckedCreateWithoutNoteDeletionsInput
+    >;
+    where?: UserWhereInput;
+  };
+
+  export type UserUpdateToOneWithWhereWithoutNoteDeletionsInput = {
+    where?: UserWhereInput;
+    data: XOR<
+      UserUpdateWithoutNoteDeletionsInput,
+      UserUncheckedUpdateWithoutNoteDeletionsInput
+    >;
+  };
+
+  export type UserUpdateWithoutNoteDeletionsInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    name?: NullableStringFieldUpdateOperationsInput | string | null;
+    email?: NullableStringFieldUpdateOperationsInput | string | null;
+    emailVerified?:
+      | NullableDateTimeFieldUpdateOperationsInput
+      | Date
+      | string
+      | null;
+    image?: NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    posts?: PostUpdateManyWithoutAuthorNestedInput;
+    notes?: NoteUpdateManyWithoutAuthorNestedInput;
+    accounts?: AccountUpdateManyWithoutUserNestedInput;
+    sessions?: SessionUpdateManyWithoutUserNestedInput;
+  };
+
+  export type UserUncheckedUpdateWithoutNoteDeletionsInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    name?: NullableStringFieldUpdateOperationsInput | string | null;
+    email?: NullableStringFieldUpdateOperationsInput | string | null;
+    emailVerified?:
+      | NullableDateTimeFieldUpdateOperationsInput
+      | Date
+      | string
+      | null;
+    image?: NullableStringFieldUpdateOperationsInput | string | null;
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    posts?: PostUncheckedUpdateManyWithoutAuthorNestedInput;
+    notes?: NoteUncheckedUpdateManyWithoutAuthorNestedInput;
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput;
   };
@@ -12142,6 +14024,7 @@ export namespace Prisma {
     updatedAt?: Date | string;
     posts?: PostCreateNestedManyWithoutAuthorInput;
     notes?: NoteCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionCreateNestedManyWithoutAuthorInput;
     sessions?: SessionCreateNestedManyWithoutUserInput;
   };
 
@@ -12155,6 +14038,7 @@ export namespace Prisma {
     updatedAt?: Date | string;
     posts?: PostUncheckedCreateNestedManyWithoutAuthorInput;
     notes?: NoteUncheckedCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionUncheckedCreateNestedManyWithoutAuthorInput;
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput;
   };
 
@@ -12200,6 +14084,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     posts?: PostUpdateManyWithoutAuthorNestedInput;
     notes?: NoteUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUpdateManyWithoutAuthorNestedInput;
     sessions?: SessionUpdateManyWithoutUserNestedInput;
   };
 
@@ -12217,6 +14102,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     posts?: PostUncheckedUpdateManyWithoutAuthorNestedInput;
     notes?: NoteUncheckedUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUncheckedUpdateManyWithoutAuthorNestedInput;
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput;
   };
 
@@ -12230,6 +14116,7 @@ export namespace Prisma {
     updatedAt?: Date | string;
     posts?: PostCreateNestedManyWithoutAuthorInput;
     notes?: NoteCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionCreateNestedManyWithoutAuthorInput;
     accounts?: AccountCreateNestedManyWithoutUserInput;
   };
 
@@ -12243,6 +14130,7 @@ export namespace Prisma {
     updatedAt?: Date | string;
     posts?: PostUncheckedCreateNestedManyWithoutAuthorInput;
     notes?: NoteUncheckedCreateNestedManyWithoutAuthorInput;
+    noteDeletions?: NoteDeletionUncheckedCreateNestedManyWithoutAuthorInput;
     accounts?: AccountUncheckedCreateNestedManyWithoutUserInput;
   };
 
@@ -12288,6 +14176,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     posts?: PostUpdateManyWithoutAuthorNestedInput;
     notes?: NoteUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUpdateManyWithoutAuthorNestedInput;
     accounts?: AccountUpdateManyWithoutUserNestedInput;
   };
 
@@ -12305,6 +14194,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     posts?: PostUncheckedUpdateManyWithoutAuthorNestedInput;
     notes?: NoteUncheckedUpdateManyWithoutAuthorNestedInput;
+    noteDeletions?: NoteDeletionUncheckedUpdateManyWithoutAuthorNestedInput;
     accounts?: AccountUncheckedUpdateManyWithoutUserNestedInput;
   };
 
@@ -12341,6 +14231,7 @@ export namespace Prisma {
     content?: string | null;
     hasContent?: boolean;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     sort?: number;
     priority?: number | null;
     isBold?: boolean;
@@ -12355,6 +14246,7 @@ export namespace Prisma {
     content?: string | null;
     hasContent?: boolean;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     sort?: number;
     priority?: number | null;
     isBold?: boolean;
@@ -12373,6 +14265,33 @@ export namespace Prisma {
 
   export type NoteCreateManyAuthorInputEnvelope = {
     data: NoteCreateManyAuthorInput | NoteCreateManyAuthorInput[];
+    skipDuplicates?: boolean;
+  };
+
+  export type NoteDeletionCreateWithoutAuthorInput = {
+    id?: string;
+    noteId: string;
+    deletedAt?: Date | string;
+  };
+
+  export type NoteDeletionUncheckedCreateWithoutAuthorInput = {
+    id?: string;
+    noteId: string;
+    deletedAt?: Date | string;
+  };
+
+  export type NoteDeletionCreateOrConnectWithoutAuthorInput = {
+    where: NoteDeletionWhereUniqueInput;
+    create: XOR<
+      NoteDeletionCreateWithoutAuthorInput,
+      NoteDeletionUncheckedCreateWithoutAuthorInput
+    >;
+  };
+
+  export type NoteDeletionCreateManyAuthorInputEnvelope = {
+    data:
+      | NoteDeletionCreateManyAuthorInput
+      | NoteDeletionCreateManyAuthorInput[];
     skipDuplicates?: boolean;
   };
 
@@ -12523,12 +14442,51 @@ export namespace Prisma {
     hasContent?: BoolFilter<'Note'> | boolean;
     authorId?: StringNullableFilter<'Note'> | string | null;
     createdAt?: DateTimeFilter<'Note'> | Date | string;
+    updatedAt?: DateTimeFilter<'Note'> | Date | string;
     sort?: IntFilter<'Note'> | number;
     priority?: IntNullableFilter<'Note'> | number | null;
     isBold?: BoolFilter<'Note'> | boolean;
     parentId?: StringNullableFilter<'Note'> | string | null;
     complete?: BoolFilter<'Note'> | boolean;
     collapsed?: BoolFilter<'Note'> | boolean;
+  };
+
+  export type NoteDeletionUpsertWithWhereUniqueWithoutAuthorInput = {
+    where: NoteDeletionWhereUniqueInput;
+    update: XOR<
+      NoteDeletionUpdateWithoutAuthorInput,
+      NoteDeletionUncheckedUpdateWithoutAuthorInput
+    >;
+    create: XOR<
+      NoteDeletionCreateWithoutAuthorInput,
+      NoteDeletionUncheckedCreateWithoutAuthorInput
+    >;
+  };
+
+  export type NoteDeletionUpdateWithWhereUniqueWithoutAuthorInput = {
+    where: NoteDeletionWhereUniqueInput;
+    data: XOR<
+      NoteDeletionUpdateWithoutAuthorInput,
+      NoteDeletionUncheckedUpdateWithoutAuthorInput
+    >;
+  };
+
+  export type NoteDeletionUpdateManyWithWhereWithoutAuthorInput = {
+    where: NoteDeletionScalarWhereInput;
+    data: XOR<
+      NoteDeletionUpdateManyMutationInput,
+      NoteDeletionUncheckedUpdateManyWithoutAuthorInput
+    >;
+  };
+
+  export type NoteDeletionScalarWhereInput = {
+    AND?: NoteDeletionScalarWhereInput | NoteDeletionScalarWhereInput[];
+    OR?: NoteDeletionScalarWhereInput[];
+    NOT?: NoteDeletionScalarWhereInput | NoteDeletionScalarWhereInput[];
+    id?: StringFilter<'NoteDeletion'> | string;
+    noteId?: StringFilter<'NoteDeletion'> | string;
+    authorId?: StringFilter<'NoteDeletion'> | string;
+    deletedAt?: DateTimeFilter<'NoteDeletion'> | Date | string;
   };
 
   export type AccountUpsertWithWhereUniqueWithoutUserInput = {
@@ -12630,12 +14588,19 @@ export namespace Prisma {
     content?: string | null;
     hasContent?: boolean;
     createdAt?: Date | string;
+    updatedAt?: Date | string;
     sort?: number;
     priority?: number | null;
     isBold?: boolean;
     parentId?: string | null;
     complete?: boolean;
     collapsed?: boolean;
+  };
+
+  export type NoteDeletionCreateManyAuthorInput = {
+    id?: string;
+    noteId: string;
+    deletedAt?: Date | string;
   };
 
   export type AccountCreateManyUserInput = {
@@ -12687,6 +14652,7 @@ export namespace Prisma {
     content?: NullableStringFieldUpdateOperationsInput | string | null;
     hasContent?: BoolFieldUpdateOperationsInput | boolean;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     sort?: IntFieldUpdateOperationsInput | number;
     priority?: NullableIntFieldUpdateOperationsInput | number | null;
     isBold?: BoolFieldUpdateOperationsInput | boolean;
@@ -12701,6 +14667,7 @@ export namespace Prisma {
     content?: NullableStringFieldUpdateOperationsInput | string | null;
     hasContent?: BoolFieldUpdateOperationsInput | boolean;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     sort?: IntFieldUpdateOperationsInput | number;
     priority?: NullableIntFieldUpdateOperationsInput | number | null;
     isBold?: BoolFieldUpdateOperationsInput | boolean;
@@ -12715,12 +14682,31 @@ export namespace Prisma {
     content?: NullableStringFieldUpdateOperationsInput | string | null;
     hasContent?: BoolFieldUpdateOperationsInput | boolean;
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
     sort?: IntFieldUpdateOperationsInput | number;
     priority?: NullableIntFieldUpdateOperationsInput | number | null;
     isBold?: BoolFieldUpdateOperationsInput | boolean;
     parentId?: NullableStringFieldUpdateOperationsInput | string | null;
     complete?: BoolFieldUpdateOperationsInput | boolean;
     collapsed?: BoolFieldUpdateOperationsInput | boolean;
+  };
+
+  export type NoteDeletionUpdateWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    noteId?: StringFieldUpdateOperationsInput | string;
+    deletedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+  };
+
+  export type NoteDeletionUncheckedUpdateWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    noteId?: StringFieldUpdateOperationsInput | string;
+    deletedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
+  };
+
+  export type NoteDeletionUncheckedUpdateManyWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string;
+    noteId?: StringFieldUpdateOperationsInput | string;
+    deletedAt?: DateTimeFieldUpdateOperationsInput | Date | string;
   };
 
   export type AccountUpdateWithoutUserInput = {

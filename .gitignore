@@ -7,3 +7,5 @@ node_modules/
 .env.*
 
 certificates
+*storybook.log
+storybook-static
