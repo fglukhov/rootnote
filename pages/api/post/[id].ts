@@ -33,17 +33,32 @@ export default async function handle(req, res) {
     }
     // ============================
 
-    // удаляем ТОЛЬКО свою заметку
-    const result = await prisma.note.deleteMany({
+    const existing = await prisma.note.findFirst({
       where: {
         id: noteId,
         authorId: user.id,
       },
+      select: { id: true },
     });
 
-    if (result.count === 0) {
+    if (!existing) {
       return res.status(404).json({ error: 'Note not found' });
     }
+
+    await prisma.$transaction([
+      prisma.noteDeletion.create({
+        data: {
+          noteId: existing.id,
+          authorId: user.id,
+        },
+      }),
+      prisma.note.deleteMany({
+        where: {
+          id: noteId,
+          authorId: user.id,
+        },
+      }),
+    ]);
 
     return res.json({ deleted: true });
   } catch (e) {

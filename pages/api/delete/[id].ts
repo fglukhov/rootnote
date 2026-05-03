@@ -46,8 +46,7 @@ export default async function handle(req, res) {
       },
     });
 
-    // 2) удалить только те заметки, которые принадлежат юзеру и не входят в remainingIds
-    const deleteNotes = await prisma.note.deleteMany({
+    const notesToDelete = await prisma.note.findMany({
       where: {
         authorId: user.id,
         NOT: {
@@ -56,9 +55,33 @@ export default async function handle(req, res) {
           },
         },
       },
+      select: {
+        id: true,
+      },
     });
 
-    return res.json(deleteNotes);
+    await prisma.$transaction([
+      ...notesToDelete.map((note) =>
+        prisma.noteDeletion.create({
+          data: {
+            noteId: note.id,
+            authorId: user.id,
+          },
+        }),
+      ),
+      prisma.note.deleteMany({
+        where: {
+          authorId: user.id,
+          NOT: {
+            id: {
+              in: remainingIds,
+            },
+          },
+        },
+      }),
+    ]);
+
+    return res.json({ deleted: notesToDelete.length });
   } catch (e) {
     console.error('API /delete error:', e);
     return res.status(500).json({

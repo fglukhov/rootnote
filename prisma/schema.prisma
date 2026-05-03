@@ -30,12 +30,24 @@ model Note {
   author    User?    @relation(fields: [authorId], references: [id])
   authorId  String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   sort      Int      @default(1)
   priority  Int?
   isBold    Boolean  @default(false)
   parentId  String?
   complete  Boolean  @default(false)
   collapsed  Boolean  @default(false)
+}
+
+model NoteDeletion {
+  id        String   @id @default(cuid())
+  noteId    String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  deletedAt DateTime @default(now())
+
+  @@index([authorId, deletedAt])
+  @@index([noteId, deletedAt])
 }
 
 model Account {
@@ -80,6 +92,7 @@ model User {
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   posts         Post[]
   notes         Note[]
+  noteDeletions NoteDeletion[]
   accounts      Account[]
   sessions      Session[]
 

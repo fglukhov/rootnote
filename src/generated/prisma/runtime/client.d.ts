@@ -7,6 +7,7 @@ import { empty } from '@prisma/client-runtime-utils';
 import { isAnyNull } from '@prisma/client-runtime-utils';
 import { isDbNull } from '@prisma/client-runtime-utils';
 import { isJsonNull } from '@prisma/client-runtime-utils';
+import { isObjectEnumValue } from '@prisma/client-runtime-utils';
 import { join } from '@prisma/client-runtime-utils';
 import { JsonNull } from '@prisma/client-runtime-utils';
 import { JsonNullClass } from '@prisma/client-runtime-utils';
@@ -572,7 +573,7 @@ declare const denylist: readonly [
   '$connect',
   '$disconnect',
   '$on',
-  '$transaction',
+  '$use',
   '$extends',
 ];
 
@@ -584,7 +585,7 @@ declare type Deprecation = ReadonlyDeep_2<{
 
 declare type DeserializedResponse = Array<Record<string, unknown>>;
 
-export declare function deserializeJsonResponse(result: unknown): unknown;
+export declare function deserializeJsonObject(result: unknown): unknown;
 
 export declare function deserializeRawResult(
   response: RawResponse,
@@ -1177,6 +1178,15 @@ declare interface EngineConfig {
    * Each plugin receives query context and returns key-value pairs.
    */
   sqlCommenters?: SqlCommenterPlugin[];
+  /**
+   * Parameterization schema (ParamGraph) for schema-aware query parameterization.
+   * Enables precise parameterization based on DMMF metadata.
+   */
+  parameterizationSchema: SerializedParamGraph;
+  /**
+   * Runtime data model for enum lookups during parameterization.
+   */
+  runtimeDataModel: RuntimeDataModel;
 }
 
 declare type EngineEvent<E extends EngineEventType> = E extends QueryEventType
@@ -1552,6 +1562,9 @@ declare type Fragment =
     }
   | {
       type: 'parameterTuple';
+      itemPrefix: string;
+      itemSeparator: string;
+      itemSuffix: string;
     }
   | {
       type: 'parameterTupleList';
@@ -1844,7 +1857,11 @@ export declare function getPrismaClient(config: GetPrismaClientConfig): {
       callback: (client: Client) => Promise<unknown>;
       options?: Options;
     }): Promise<unknown>;
-    _createItxClient(transaction: PrismaPromiseInteractiveTransaction): Client;
+    _createItxClient(
+      transaction: PrismaPromiseInteractiveTransaction,
+      scopeId: string,
+      scopeState: ItxScopeState,
+    ): Client;
     /**
      * Execute queries within a transaction
      * @param input a callback or a query list
@@ -1901,6 +1918,11 @@ export declare type GetPrismaClientConfig = {
    * Optional wasm loading configuration
    */
   compilerWasm?: CompilerWasmLoadingConfig;
+  /**
+   * Parameterization schema for schema-aware query parameterization.
+   * Enables precise parameterization based on DMMF metadata.
+   */
+  parameterizationSchema: SerializedParamGraph;
 };
 
 export declare type GetResult<
@@ -2153,6 +2175,8 @@ export { isDbNull };
 
 export { isJsonNull };
 
+export { isObjectEnumValue };
+
 declare type IsolationLevel =
   | 'READ UNCOMMITTED'
   | 'READ COMMITTED'
@@ -2174,6 +2198,10 @@ export declare function isTypedSql(value: unknown): value is UnknownTypedSql;
 export declare type ITXClientDenyList = (typeof denylist)[number];
 
 export declare const itxClientDenyList: readonly (string | symbol)[];
+
+declare type ItxScopeState = {
+  stack: string[];
+};
 
 declare interface Job {
   resolve: (data: any) => void;
@@ -2671,6 +2699,11 @@ declare type Options = {
   timeout?: number;
   /** Transaction isolation level */
   isolationLevel?: IsolationLevel_2;
+  /**
+   * Used for nested interactive transactions. When provided, the engine may
+   * re-use an existing open transaction instead of opening a new one.
+   */
+  newTxId?: string;
 };
 
 export declare type Or<A extends 1 | 0, B extends 1 | 0> = {
@@ -2699,7 +2732,7 @@ declare type OutputTypeRef = TypeRef<
 >;
 
 declare type Pagination = {
-  cursor: Record<string, PrismaValue> | null;
+  cursor: Record<string, unknown> | null;
   take: number | null;
   skip: number | null;
 };
@@ -3178,6 +3211,7 @@ declare type QueryPlanNode =
       args: {
         parent: QueryPlanNode;
         children: JoinExpression[];
+        canAssumeStrictEquality: boolean;
       };
     }
   | {
@@ -3490,6 +3524,7 @@ declare type SchemaArg = ReadonlyDeep_2<{
   isNullable: boolean;
   isRequired: boolean;
   inputTypes: InputTypeRef[];
+  isParameterizable: boolean;
   requiresOtherFields?: string[];
   deprecation?: Deprecation;
 }>;
@@ -3538,6 +3573,16 @@ export declare type SelectField<
 declare type Selection_2 = Record<string, boolean | Skip | JsArgs>;
 export { Selection_2 as Selection };
 
+/**
+ * Serialized format stored in the generated client.
+ */
+declare interface SerializedParamGraph {
+  /** String table (field names, enum names, root keys) */
+  strings: string[];
+  /** Base64url-encoded binary blob for structural data */
+  graph: string;
+}
+
 export declare function serializeJsonQuery({
   modelName,
   action,
@@ -3550,6 +3595,7 @@ export declare function serializeJsonQuery({
   clientVersion,
   previewFeatures,
   globalOmit,
+  wrapRawValues,
 }: SerializeParams): JsonQuery;
 
 declare type SerializeParams = {
@@ -3564,6 +3610,7 @@ declare type SerializeParams = {
   errorFormat: ErrorFormat;
   previewFeatures: string[];
   globalOmit?: GlobalOmitOptions;
+  wrapRawValues?: boolean;
 };
 
 declare class Skip {
@@ -4067,6 +4114,18 @@ declare interface Transaction extends AdapterInfo, SqlQueryable {
    * Roll back the transaction.
    */
   rollback(): Promise<void>;
+  /**
+   * Creates a savepoint within the currently running transaction.
+   */
+  createSavepoint?(name: string): Promise<void>;
+  /**
+   * Rolls back transaction state to a previously created savepoint.
+   */
+  rollbackToSavepoint?(name: string): Promise<void>;
+  /**
+   * Releases a previously created savepoint. Optional because not every connector supports this operation.
+   */
+  releaseSavepoint?(name: string): Promise<void>;
 }
 
 declare namespace Transaction_2 {
@@ -4212,7 +4271,7 @@ declare namespace Utils {
 
 declare type ValidationError =
   | {
-      error_identifier: 'RELATION_VIOLATION';
+      errorIdentifier: 'RELATION_VIOLATION';
       context: {
         relation: string;
         modelA: string;
@@ -4220,7 +4279,7 @@ declare type ValidationError =
       };
     }
   | {
-      error_identifier: 'MISSING_RELATED_RECORD';
+      errorIdentifier: 'MISSING_RELATED_RECORD';
       context: {
         model: string;
         relation: string;
@@ -4230,19 +4289,19 @@ declare type ValidationError =
       };
     }
   | {
-      error_identifier: 'MISSING_RECORD';
+      errorIdentifier: 'MISSING_RECORD';
       context: {
         operation: string;
       };
     }
   | {
-      error_identifier: 'INCOMPLETE_CONNECT_INPUT';
+      errorIdentifier: 'INCOMPLETE_CONNECT_INPUT';
       context: {
         expectedRows: number;
       };
     }
   | {
-      error_identifier: 'INCOMPLETE_CONNECT_OUTPUT';
+      errorIdentifier: 'INCOMPLETE_CONNECT_OUTPUT';
       context: {
         expectedRows: number;
         relation: string;
@@ -4250,7 +4309,7 @@ declare type ValidationError =
       };
     }
   | {
-      error_identifier: 'RECORDS_NOT_CONNECTED';
+      errorIdentifier: 'RECORDS_NOT_CONNECTED';
       context: {
         relation: string;
         parent: string;

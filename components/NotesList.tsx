@@ -11,6 +11,12 @@ import { NotesProvider } from '@/components/NotesContext';
 import { NotesListItemProps } from '@/components/NotesListItem';
 import { useKeyPress } from '@/lib/useKeyPress';
 import { getFamily, removeFamily, getNoteDepth } from '@/lib/notesTree';
+import {
+  type NoteDeleteUndoSnapshot,
+  captureAnchorSiblingId,
+  restoreDeletedFamilyIntoFeed,
+  expandAncestorsForRestore,
+} from '@/lib/noteDeleteUndo';
 import NotesHotkeysHints from '@/components/NotesHotkeysHints';
 import { Button } from '@/components/Button';
 import styles from '@/components/NotesList.module.scss';
@@ -36,13 +42,40 @@ export type FeedModalSync =
 
 type Props = {
   feed: NotesListItemProps[];
+  /** Enables periodic remote sync for authenticated users. */
+  enableRemoteSync?: boolean;
   /** One-shot sync from the note modal (save, delete, …). */
   feedModalSync?: FeedModalSync | null;
   /** Called whenever the local notesFeed changes (for optimistic modal opening). */
   onFeedChange?: (feed: NotesListItemProps[]) => void;
 };
 
-let updateTimeout: ReturnType<typeof setTimeout> | null = null;
+type SyncChangeNote = Pick<
+  NotesListItemProps,
+  | 'id'
+  | 'title'
+  | 'content'
+  | 'hasContent'
+  | 'parentId'
+  | 'sort'
+  | 'complete'
+  | 'collapsed'
+  | 'priority'
+>;
+
+type SyncChangesResponse = {
+  changes: Array<{
+    op: 'upsert' | 'delete';
+    id: string;
+    updatedAt: string;
+    note?: SyncChangeNote;
+  }>;
+  nextSince: string;
+  hasMore: boolean;
+};
+
+const UNDO_DELETE_MS = 10_000;
+
 //let reorderInterval = null;
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -102,6 +135,36 @@ const markSiblingsForSync = (
   }
 };
 
+const findPositionByIdInFeed = (
+  feed: NotesListItemProps[],
+  targetId: string,
+): number | null => {
+  let position = 0;
+
+  const visit = (parentKey: string): number | null => {
+    const children = feed
+      .filter((n) => (n.parentId ?? 'root') === parentKey)
+      .slice()
+      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+
+    for (const note of children) {
+      if (note.id === targetId) {
+        return position;
+      }
+
+      position += 1;
+      const found = visit(note.id);
+      if (found !== null) {
+        return found;
+      }
+    }
+
+    return null;
+  };
+
+  return visit('root');
+};
+
 export function applyFeedModalSync(
   prev: NotesListItemProps[],
   sync: FeedModalSync,
@@ -154,7 +217,9 @@ const NotesList: React.FC<Props> = (props) => {
 
   const [cursorPosition, setCursorPosition] = useState(0);
   const [notesFeed, setNotesFeed] = useState(props.feed);
-  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [showRestoreUndo, setShowRestoreUndo] = useState(false);
+  const deleteUndoRef = useRef<NoteDeleteUndoSnapshot | null>(null);
+  const undoTimerRef = useRef<number | null>(null);
 
   const router = useRouter();
   const isNoteModalOpen = router.isReady && Boolean(router.query.note);
@@ -173,6 +238,11 @@ const NotesList: React.FC<Props> = (props) => {
   const [isChanged, setIsChanged] = useState(false);
 
   const isChangedRef = useRef(isChanged);
+  const isUpdatingRef = useRef(isUpdating);
+  /** True as soon as local edits queue an outbound save (before React commits isChanged). */
+  const outboundDirtyRef = useRef(false);
+  const isSyncingRemoteRef = useRef(false);
+  const remoteSinceRef = useRef<string>(new Date().toISOString());
 
   const hiddenRanges = useMemo(() => {
     const ranges: { start: number; end: number }[] = [];
@@ -208,8 +278,6 @@ const NotesList: React.FC<Props> = (props) => {
     // TODO notes are not synchronized while a form is open, but syncing breaks sorting
 
     if (isChanged && !isUpdating) {
-      console.log('refresh');
-
       setIsChanged(false);
       setIsUpdating(true);
 
@@ -220,6 +288,9 @@ const NotesList: React.FC<Props> = (props) => {
             prevFeed.current = syncFeed.current.map((n) => ({ ...n }));
           }
 
+          outboundDirtyRef.current =
+            savedUpdatedIds.current.length > 0 || updatedIds.current.length > 0;
+
           // If new changes appear while sending, send one more time.
           if (isChangedRef.current) {
             reorderCallback();
@@ -229,6 +300,8 @@ const NotesList: React.FC<Props> = (props) => {
           console.error(err);
 
           setIsUpdating(false);
+          outboundDirtyRef.current =
+            savedUpdatedIds.current.length > 0 || updatedIds.current.length > 0;
 
           // Retry as well if changes appeared while the request failed.
           if (isChangedRef.current) {
@@ -239,11 +312,16 @@ const NotesList: React.FC<Props> = (props) => {
   }
 
   const scheduleSyncUpdate = () => {
-    updateTimeout = setTimeout(function () {
-      setIsChanged(true);
-      savedUpdatedIds.current = updatedIds.current;
-      updatedIds.current = [];
-    }, 1000);
+    outboundDirtyRef.current = true;
+    // Merge ids immediately so the next POST always sees the full pending set.
+    // Setting isChanged without the old 1s delay blocks remote sync from overwriting
+    // local sort/collapse state before the outbound request arms (see runSyncTick).
+    savedUpdatedIds.current = Array.from(
+      new Set([...savedUpdatedIds.current, ...updatedIds.current]),
+    );
+    updatedIds.current = [];
+
+    setIsChanged(true);
   };
 
   const removeNoteFamilyFromFeed = (
@@ -270,55 +348,95 @@ const NotesList: React.FC<Props> = (props) => {
     return newFeed;
   };
 
-  const finalizePendingDelete = (): boolean => {
-    if (!pendingDeleteId) return false;
+  const clearDeleteUndoTimer = () => {
+    if (undoTimerRef.current) {
+      clearTimeout(undoTimerRef.current);
+      undoTimerRef.current = null;
+    }
+  };
 
-    const newFeed = removeNoteFamilyFromFeed(pendingDeleteId, notesFeed);
-    scheduleSyncUpdate();
-    syncFeed.current = newFeed;
-    setNotesFeed(newFeed);
-    setPendingDeleteId(null);
-    setCursorPosition((cp) =>
-      newFeed.length === 0 ? 0 : Math.min(cp, newFeed.length - 1),
+  const clearDeleteUndo = () => {
+    clearDeleteUndoTimer();
+    deleteUndoRef.current = null;
+    setShowRestoreUndo(false);
+  };
+
+  const performUndoRestore = () => {
+    const snap = deleteUndoRef.current;
+    if (!snap) return;
+
+    clearDeleteUndo();
+
+    let { feed: merged, parentId } = restoreDeletedFamilyIntoFeed(
+      notesFeed,
+      snap,
     );
-    return true;
-  };
+    merged = expandAncestorsForRestore(merged, snap.rootId);
 
-  const clearPendingDelete = () => {
-    setPendingDeleteId(null);
-  };
+    for (const n of snap.removedFamily) {
+      if (!updatedIds.current.includes(n.id)) {
+        updatedIds.current.push(n.id);
+      }
+    }
+    markSiblingsForSync(merged, parentId, updatedIds.current);
 
-  const handleRestore = (noteId: string) => {
-    if (pendingDeleteId !== noteId) return;
-    clearPendingDelete();
+    scheduleSyncUpdate();
+    syncFeed.current = merged;
+    setNotesFeed(merged);
+
+    focusId.current = snap.rootId;
+    const pos = findPositionByIdInFeed(merged, snap.rootId);
+    if (pos !== null) {
+      setCursorPosition(pos);
+    }
   };
 
   const handleDelete = (noteId?: string) => {
     setIsEditTitle(false);
 
-    if (updateTimeout) {
-      clearTimeout(updateTimeout);
-    }
-
     const targetId = noteId ?? focusId.current ?? undefined;
     if (!targetId) return;
 
-    if (pendingDeleteId === targetId) {
-      finalizePendingDelete();
-      return;
-    }
+    const curNote = notesFeed.find((n) => n.id === targetId);
+    if (!curNote) return;
 
-    if (pendingDeleteId && pendingDeleteId !== targetId) {
-      finalizePendingDelete();
-    }
+    const family = getFamily(targetId, notesFeed);
+    const removedFamily = family.map((n) => ({ ...n }));
+    const anchorSiblingId = captureAnchorSiblingId(
+      notesFeed,
+      targetId,
+      curNote.parentId,
+    );
 
-    setPendingDeleteId(targetId);
+    clearDeleteUndo();
+
+    deleteUndoRef.current = {
+      removedFamily,
+      rootId: targetId,
+      parentId: curNote.parentId,
+      anchorSiblingId,
+    };
+    setShowRestoreUndo(true);
+    undoTimerRef.current = window.setTimeout(() => {
+      undoTimerRef.current = null;
+      deleteUndoRef.current = null;
+      setShowRestoreUndo(false);
+    }, UNDO_DELETE_MS);
+
+    const newFeed = removeNoteFamilyFromFeed(targetId, notesFeed);
+    scheduleSyncUpdate();
+    syncFeed.current = newFeed;
+    setNotesFeed(newFeed);
+
+    setCursorPosition((cp) =>
+      newFeed.length === 0 ? 0 : Math.min(cp, newFeed.length - 1),
+    );
   };
 
   const insertNote = (
     event: KeyboardEvent | { shiftKey: boolean; altKey: boolean } | null,
   ): void => {
-    finalizePendingDelete();
+    clearDeleteUndo();
 
     if (event == null) {
       event = {
@@ -433,6 +551,7 @@ const NotesList: React.FC<Props> = (props) => {
       setCursorPosition(insertAt);
       setIsEditTitle(true);
       focusId.current = newId;
+      syncFeed.current = newFeed;
       setNotesFeed(newFeed);
     }, 1);
   };
@@ -469,9 +588,42 @@ const NotesList: React.FC<Props> = (props) => {
   }, [isChanged]);
 
   useEffect(() => {
+    isUpdatingRef.current = isUpdating;
+  }, [isUpdating]);
+
+  useEffect(() => {
+    const timestamps = props.feed
+      .map((n) => {
+        const raw = (n as NotesListItemProps & { updatedAt?: string | Date })
+          .updatedAt;
+        if (!raw) return null;
+        const parsed = new Date(raw);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+      })
+      .filter((v): v is Date => v instanceof Date);
+
+    if (timestamps.length === 0) {
+      remoteSinceRef.current = new Date().toISOString();
+      return;
+    }
+
+    const latestMs = Math.max(...timestamps.map((d) => d.getTime()));
+    remoteSinceRef.current = new Date(latestMs).toISOString();
+  }, [props.feed]);
+
+  useEffect(() => {
     props.onFeedChange?.(notesFeed);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notesFeed]);
+
+  useEffect(() => {
+    return () => {
+      if (undoTimerRef.current) {
+        clearTimeout(undoTimerRef.current);
+        undoTimerRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const sync = props.feedModalSync;
@@ -493,33 +645,143 @@ const NotesList: React.FC<Props> = (props) => {
     }
   }, [props.feedModalSync]);
 
-  const findPositionById = useCallback(
-    (targetId: string): number | null => {
-      let position = 0;
+  useEffect(() => {
+    if (!props.enableRemoteSync) return;
+    if (typeof window === 'undefined') return;
 
-      const visit = (parentKey: string): number | null => {
-        const children = notesFeed
-          .filter((n) => (n.parentId ?? 'root') === parentKey)
-          .slice()
-          // `sort` is the position inside the current parent.
-          .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+    let cancelled = false;
 
-        for (const note of children) {
-          if (note.id === targetId) {
-            return position;
+    const applyChanges = (
+      baseFeed: NotesListItemProps[],
+      changes: SyncChangesResponse['changes'],
+    ) => {
+      let nextFeed = baseFeed.slice();
+      const touchedParents = new Set<string | null | undefined>();
+
+      for (const change of changes) {
+        if (change.op === 'delete') {
+          const idx = nextFeed.findIndex((n) => n.id === change.id);
+          if (idx >= 0) {
+            touchedParents.add(nextFeed[idx].parentId);
+            nextFeed.splice(idx, 1);
           }
+          continue;
+        }
+        if (!change.note) continue;
+        const incoming = change.note;
+        const idx = nextFeed.findIndex((n) => n.id === incoming.id);
+        const prevParent = idx >= 0 ? nextFeed[idx].parentId : null;
 
-          position += 1;
-          const found = visit(note.id);
-          if (found !== null) {
-            return found;
-          }
+        if (idx >= 0) {
+          nextFeed[idx] = {
+            ...nextFeed[idx],
+            ...incoming,
+            isNew: false,
+          };
+        } else {
+          nextFeed.push({
+            ...incoming,
+            isNew: false,
+          });
         }
 
-        return null;
-      };
+        touchedParents.add(prevParent);
+        touchedParents.add(incoming.parentId);
+      }
 
-      return visit('root');
+      for (const parentId of Array.from(touchedParents)) {
+        nextFeed = renormalizeSortsForParent(nextFeed, parentId);
+      }
+
+      return nextFeed;
+    };
+
+    const runSyncTick = async () => {
+      if (cancelled) return;
+      if (isSyncingRemoteRef.current) return;
+      if (
+        outboundDirtyRef.current ||
+        isChangedRef.current ||
+        isUpdatingRef.current
+      )
+        return;
+      if (isEditTitle || isNoteModalOpen || showRestoreUndo) return;
+
+      isSyncingRemoteRef.current = true;
+      try {
+        const stateRes = await fetch(
+          `/api/sync/state?since=${encodeURIComponent(remoteSinceRef.current)}`,
+        );
+        if (!stateRes.ok) return;
+        const stateData = (await stateRes.json()) as {
+          hasChanges?: boolean;
+          latestUpdatedAt?: string | null;
+        };
+        if (!stateData.hasChanges) return;
+
+        const changesRes = await fetch(
+          `/api/sync/changes?since=${encodeURIComponent(remoteSinceRef.current)}&limit=200`,
+        );
+        if (!changesRes.ok) return;
+
+        const payload = (await changesRes.json()) as SyncChangesResponse;
+        if (!Array.isArray(payload.changes) || payload.changes.length === 0) {
+          if (
+            typeof payload.nextSince === 'string' &&
+            payload.nextSince.length > 0
+          ) {
+            remoteSinceRef.current = payload.nextSince;
+          }
+          return;
+        }
+
+        setNotesFeed((prev) => {
+          const next = applyChanges(prev, payload.changes);
+          syncFeed.current = next.map((n) => ({ ...n }));
+          prevFeed.current = next.map((n) => ({ ...n }));
+          const currentFocusId = focusId.current;
+          if (currentFocusId) {
+            const restoredPosition = findPositionByIdInFeed(
+              next,
+              currentFocusId,
+            );
+            if (restoredPosition !== null) {
+              setCursorPosition(restoredPosition);
+            } else {
+              setCursorPosition((cp) =>
+                next.length === 0 ? 0 : Math.min(cp, next.length - 1),
+              );
+            }
+          }
+          return next;
+        });
+
+        if (
+          typeof payload.nextSince === 'string' &&
+          payload.nextSince.length > 0
+        ) {
+          remoteSinceRef.current = payload.nextSince;
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        isSyncingRemoteRef.current = false;
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      void runSyncTick();
+    }, 5000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [isEditTitle, isNoteModalOpen, showRestoreUndo, props.enableRemoteSync]);
+
+  const findPositionById = useCallback(
+    (targetId: string): number | null => {
+      return findPositionByIdInFeed(notesFeed, targetId);
     },
     [notesFeed],
   );
@@ -583,15 +845,7 @@ const NotesList: React.FC<Props> = (props) => {
     row.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }, [router.isReady, noteIdFromQuery, notesFeed, cursorPosition]);
 
-  const clearPendingUpdateTimeout = () => {
-    if (updateTimeout) {
-      clearTimeout(updateTimeout);
-    }
-  };
-
   const setCollapsedState = (noteId: string, collapsed: boolean) => {
-    clearPendingUpdateTimeout();
-
     const curNote = notesFeed.find((n) => n.id == noteId);
     if (!curNote) return;
 
@@ -613,7 +867,6 @@ const NotesList: React.FC<Props> = (props) => {
   };
 
   const handleToggleCollapse = (noteId: string) => {
-    finalizePendingDelete();
     const curNote = notesFeed.find((n) => n.id == noteId);
     if (!curNote) return;
     setCollapsedState(noteId, !curNote.collapsed);
@@ -726,7 +979,6 @@ const NotesList: React.FC<Props> = (props) => {
     }
 
     event.preventDefault();
-    clearPendingUpdateTimeout();
 
     let curNote = notesFeed.find((n) => n.id == focusId.current);
     if (!curNote) return;
@@ -784,7 +1036,6 @@ const NotesList: React.FC<Props> = (props) => {
     }
 
     event.preventDefault();
-    clearPendingUpdateTimeout();
 
     let curNote = notesFeed.find((n) => n.id == focusId.current);
     if (!curNote) return;
@@ -885,7 +1136,6 @@ const NotesList: React.FC<Props> = (props) => {
     }
 
     event.preventDefault();
-    clearPendingUpdateTimeout();
 
     let sortShift = 0;
     let curNote = notesFeed.find((n) => n.id == focusId.current);
@@ -950,7 +1200,6 @@ const NotesList: React.FC<Props> = (props) => {
     }
 
     event.preventDefault();
-    clearPendingUpdateTimeout();
 
     let curNote = notesFeed.find((n) => n.id == focusId.current);
 
@@ -986,11 +1235,10 @@ const NotesList: React.FC<Props> = (props) => {
   };
 
   const handleCompleteChange = (noteId: string, isComplete: boolean) => {
-    finalizePendingDelete();
+    clearDeleteUndo();
     const curNote = notesFeed.find((n) => n.id === noteId);
     if (!curNote) return;
 
-    clearPendingUpdateTimeout();
     const familyIds = new Set(getFamily(noteId, notesFeed).map((n) => n.id));
 
     const newFeed = notesFeed.map((n) => {
@@ -1045,7 +1293,6 @@ const NotesList: React.FC<Props> = (props) => {
     }
 
     event.preventDefault();
-    clearPendingUpdateTimeout();
 
     const updatedPriority =
       curNote.priority === nextPriority ? null : nextPriority;
@@ -1080,7 +1327,6 @@ const NotesList: React.FC<Props> = (props) => {
     }
 
     event.preventDefault();
-    clearPendingUpdateTimeout();
 
     const newFeed = notesFeed.map((n) => {
       if (n.id !== curNote.id) {
@@ -1116,7 +1362,6 @@ const NotesList: React.FC<Props> = (props) => {
     if (!curNote) return;
 
     event.preventDefault();
-    clearPendingUpdateTimeout();
 
     const newFeed = notesFeed.map((n) => {
       if (n.id !== curNote.id) return n;
@@ -1144,7 +1389,6 @@ const NotesList: React.FC<Props> = (props) => {
 
     clearTimeout(timeout);
     lastKeyRef.current = null;
-    clearPendingUpdateTimeout();
 
     const newFeed = notesFeed.map((n) => {
       if (n.id !== curNote.id) return n;
@@ -1187,8 +1431,12 @@ const NotesList: React.FC<Props> = (props) => {
       return;
     }
 
-    if (pendingDeleteId && event.code !== 'Delete') {
-      finalizePendingDelete();
+    if (isCtrlCommand && event.code === 'KeyZ' && !event.shiftKey) {
+      if (deleteUndoRef.current) {
+        event.preventDefault();
+        performUndoRestore();
+        return;
+      }
     }
 
     eventKeyRef.current = event.code;
@@ -1296,10 +1544,7 @@ const NotesList: React.FC<Props> = (props) => {
   };
 
   const handleEdit = (noteId: string, title: string): void => {
-    finalizePendingDelete();
-    if (updateTimeout) {
-      clearTimeout(updateTimeout);
-    }
+    clearDeleteUndo();
 
     let curNote = notesFeed.find((n) => n.id == noteId);
     if (!curNote) return;
@@ -1519,7 +1764,7 @@ const NotesList: React.FC<Props> = (props) => {
     parentId: string | undefined,
     sort: number | undefined,
   ): void => {
-    finalizePendingDelete();
+    clearDeleteUndo();
     setIsEditTitle(false);
     clearTimeout(timeout);
     lastKeyRef.current = null;
@@ -1713,8 +1958,8 @@ const NotesList: React.FC<Props> = (props) => {
                       focusId.current = curId;
                     }}
                     onSelect={(curId, position, startEditTitle) => {
-                      if (pendingDeleteId && pendingDeleteId !== curId) {
-                        finalizePendingDelete();
+                      if (showRestoreUndo && focusId.current !== curId) {
+                        clearDeleteUndo();
                       }
                       // Clicking moves focus; double-click enters edit mode.
                       setIsEditTitle(Boolean(startEditTitle));
@@ -1726,16 +1971,11 @@ const NotesList: React.FC<Props> = (props) => {
                     onDelete={(curId) => handleDelete(curId)}
                     isNew={note.isNew}
                     onToggleCollapse={(curId, position) => {
-                      if (pendingDeleteId && pendingDeleteId !== curId) {
-                        finalizePendingDelete();
-                      }
                       handleToggleCollapse(curId);
                       setCursorPosition(position);
                       focusId.current = curId;
                     }}
                     onComplete={handleCompleteChange}
-                    pendingDeleteId={pendingDeleteId}
-                    onRestore={handleRestore}
                     onRunAction={runMenuAction}
                   />
                 );
@@ -1743,6 +1983,7 @@ const NotesList: React.FC<Props> = (props) => {
             })()}
           </NotesProvider>
         </div>
+
         <div className={styles.mobile_toolbar + ' md:hidden'}>
           <Button
             type="button"
@@ -1759,6 +2000,17 @@ const NotesList: React.FC<Props> = (props) => {
             Add above
           </Button>
         </div>
+
+        {showRestoreUndo && (
+          <button
+            type="button"
+            className={styles.restore_undo_btn}
+            aria-label="Restore deleted note"
+            onClick={() => performUndoRestore()}
+          >
+            Restore
+          </button>
+        )}
       </div>
       <div className="flex-[0_0_340px] max-w-[340px] hidden md:block">
         <NotesHotkeysHints />

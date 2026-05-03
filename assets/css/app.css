@@ -42,20 +42,24 @@
     transition: opacity 0.12s ease;
   }
 
-  .notes-list-item.notes-list-item--focus .notes-list-item-title:focus-within
+  .notes-list-item.notes-list-item--focus
+    .notes-list-item-title:focus-within
     .notes-list-item-more-button {
     opacity: 1;
     pointer-events: auto;
   }
 
-  .notes-list-item.notes-list-item--focus > .notes-list-item-row
+  .notes-list-item.notes-list-item--focus
+    > .notes-list-item-row
     .notes-list-item-more-button {
     opacity: 1;
     pointer-events: auto;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    body:not(.notes-keyboard-nav) .notes-list-item-title:hover .notes-list-item-more-button {
+    body:not(.notes-keyboard-nav)
+      .notes-list-item-title:hover
+      .notes-list-item-more-button {
       opacity: 1;
       pointer-events: auto;
     }
